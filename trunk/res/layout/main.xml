@@ -33,46 +33,32 @@
  * @author Jason Antman <jason@jasonantman.com>
  -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"  
-    >
-    <ImageView android:src="@drawable/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-        <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Name: "
-            />
-            <TextView android:id="@+id/contact_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-            />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone: "
-            />
-            <TextView android:id="@+id/phone_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-            />
-        </LinearLayout>
-    </LinearLayout>
-        
-</LinearLayout>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/RelativeLayout" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	
+	<ImageView android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/icon" android:id="@+id/taskIcon"/>
+
+	<TextView android:id="@+id/timeMins"  
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" 
+		android:layout_marginTop="5px" 
+		android:layout_marginRight="5px"/>
+		
+	<TextView android:id="@+id/title"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:layout_centerInParent="false" 
+		android:layout_centerHorizontal="false" 
+		android:layout_alignTop="@+id/taskIcon" 
+		android:layout_marginTop="5px" 
+		android:layout_toRightOf="@+id/taskIcon" 
+		android:gravity="left" 
+		android:layout_alignWithParentIfMissing="true"/>
+		
+</RelativeLayout>

@@ -210,7 +210,7 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
         
         if (values.containsKey(Tasks.TITLE) == false) {
             Resources r = Resources.getSystem();
-            values.put(Tasks.TITLE, r.getString(android.R.string.untitled));
+            values.put(Tasks.TITLE, "");
         }
 
         if (values.containsKey(Tasks.IS_FINISHED) == false) {

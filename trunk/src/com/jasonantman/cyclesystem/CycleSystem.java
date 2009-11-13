@@ -105,9 +105,9 @@ public class CycleSystem extends ListActivity {
         Cursor cursor = managedQuery(getIntent().getData(), PROJECTION, null, null,
                 Tasks.DEFAULT_SORT_ORDER);
 
-        // Used to map notes entries from the database to views
+        // Used to map task entries from the database to views
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main, cursor,
-        		new String[] { Tasks.TITLE }, new int[] { android.R.id.text1 });
+        		new String[] { Tasks.TITLE, Tasks._ID }, new int[] { R.id.title, R.id.timeMins });
         setListAdapter(adapter);
     }
 
@@ -146,7 +146,7 @@ public class CycleSystem extends ListActivity {
         super.onPrepareOptionsMenu(menu);
         final boolean haveItems = getListAdapter().getCount() > 0;
 
-        // If there are any notes in the list (which implies that one of
+        // If there are any tasks in the list (which implies that one of
         // them is selected), then we need to generate the actions that
         // can be performed on the current selection.  This will be a combination
         // of our own specific actions along with any extensions that can be
