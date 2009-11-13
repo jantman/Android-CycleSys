@@ -107,7 +107,7 @@ public class CycleSystem extends ListActivity {
 
         // Used to map notes entries from the database to views
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main, cursor,
-                new String[] { Tasks.TITLE }, new int[] { android.R.id.text1 });
+        		new String[] { Tasks.TITLE }, new int[] { android.R.id.text1 });
         setListAdapter(adapter);
     }
 

@@ -45,7 +45,7 @@ import android.provider.BaseColumns;
  * NotePadProvider
  */
 public final class TaskList {
-    public static final String AUTHORITY = "com.jasonantman.android.CycleSystem.provider.Task";
+    public static final String AUTHORITY = "com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider";
 
     // This class cannot be instantiated
     private TaskList() {}
@@ -82,8 +82,8 @@ public final class TaskList {
          * The task id
          * <P>Type: INTEGER</P>
          */
-        public static final String _ID = "id";
-
+        public static final String _ID = "_id";
+        
         /**
          * The timestamp for when the task was created
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>

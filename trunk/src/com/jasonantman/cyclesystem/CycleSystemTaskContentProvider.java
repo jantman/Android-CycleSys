@@ -60,6 +60,9 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 
 	private static final String TAG = "CycleSystemTaskContentProvider"; // for debugging/Log
 	
+	public static final Uri CONTENT_URI = Uri.parse("content://com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider");
+	public static final String AUTHORITY = "com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider";
+	
     private static final String DATABASE_NAME = "cyclesystem.db";
     private static final int DATABASE_VERSION = 1;
     private static final String TASKS_TABLE_NAME = "tasks";
@@ -87,7 +90,7 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TASKS_TABLE_NAME + " ("
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + TASKS_TABLE_NAME + " ("
                     + Tasks._ID + " INTEGER PRIMARY KEY,"
                     + Tasks.CREATED_TS + " INTEGER,"
                     + Tasks.MODIFIED_TS + " INTEGER,"
@@ -295,8 +298,8 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(TaskList.AUTHORITY, "notes", TASKS);
-        sUriMatcher.addURI(TaskList.AUTHORITY, "notes/#", TASK_ID);
+        sUriMatcher.addURI(TaskList.AUTHORITY, "tasks", TASKS);
+        sUriMatcher.addURI(TaskList.AUTHORITY, "tasks/#", TASK_ID);
 
         sTasksProjectionMap = new HashMap<String, String>();
         sTasksProjectionMap.put(Tasks._ID, Tasks._ID);
