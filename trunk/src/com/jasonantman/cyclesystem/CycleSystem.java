@@ -70,6 +70,7 @@ public class CycleSystem extends ListActivity {
     private static final String[] PROJECTION = new String[] {
             Tasks._ID, // 0
             Tasks.TITLE, // 1
+            Tasks.PRIORITY, //2
     };
 	
     // controls debugging-level output
@@ -109,8 +110,8 @@ public class CycleSystem extends ListActivity {
                 Tasks.DEFAULT_SORT_ORDER);
 
         // Used to map task entries from the database to views
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.main, cursor,
-        		new String[] { Tasks.TITLE, Tasks._ID }, new int[] { R.id.title, R.id.timeMins });
+        TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
+        		new String[] { Tasks.TITLE, Tasks._ID, Tasks.PRIORITY }, new int[] { R.id.title, R.id.timeMins, R.id.taskIcon });
         setListAdapter(adapter);
     }
 
