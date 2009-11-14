@@ -45,6 +45,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -63,13 +64,29 @@ public class TaskEditor extends Activity {
     private static final String[] PROJECTION = new String[] {
             Tasks._ID, // 0
             Tasks.TITLE, // 1
+            Tasks.CATEGORY_ID, // 2
+            Tasks.DISPLAY_TS, // 3
+            Tasks.PRIORITY, // 4
+            Tasks.TIME_MIN, //5
+    };
+
+    private static final String[] CATEGORIES = new String[] {
+        "Work", // 0
+        "Personal" // 1
     };
     
     /** The index of the task column */
     private static final int COLUMN_INDEX_TASK = 1;
+    private static final int COLUMN_INDEX_CATEGORY = 2;
+    private static final int COLUMN_INDEX_DISPLAY_TS = 3;
+    private static final int COLUMN_INDEX_PRIORITY = 4;
+    private static final int COLUMN_INDEX_TIME_MIN = 5;
     
     // controls debugging-level output
     public static final boolean DEBUG_ON = true;
+    
+    // anything past this number is treated as the last priority option
+    public static final int MAX_PRIORITY = 3;
     
     // This is our state data that is stored when freezing.
     private static final String ORIGINAL_CONTENT = "origContent";
@@ -89,16 +106,38 @@ public class TaskEditor extends Activity {
     private Cursor mCursor;
     private String myOriginalContent;
 
+    // title text area
     private EditText titleEdit;
-
+    // priority spinner
+    private Spinner prioritySpinner;
+    // category spinner
+    private Spinner categorySpinner;
+    private ArrayAdapter<CharSequence> categorySpinnerAdapter;
+    // time in minutes (timeMins)
+    private EditText timeMins;
+    // date selector
+    private DatePicker datePick;
+    
+    /**
+     * Find the id of a category by name
+     * @TODO - TODO - re-code this in a logical way
+     * @param name name of the category
+     * @return Integer
+     */
+    private Integer getCategoryIdByName(String name) {
+    	for(Integer i = 0; i < CATEGORIES.length; i++)
+    	{
+    		if(name.equals(CATEGORIES[i])){ return i;}
+    	}
+    	return 1; // DEFAULT CASE
+    }
+    
     //@Override
     protected void onCreate(Bundle savedInstanceState) {
     	
     	if(DEBUG_ON) { Log.d(TAG, "onCreate called"); }
     	
         super.onCreate(savedInstanceState);
-        
-        if(DEBUG_ON) { Log.d(TAG, "finished calling super()"); }
 
         final Intent intent = getIntent();
 
@@ -140,14 +179,32 @@ public class TaskEditor extends Activity {
         titleEdit = (EditText) findViewById(R.id.title);
 
         // spinner for priority
-        Spinner s = (Spinner) findViewById(R.id.priority);
+        // @TODO - TODO - for now, this is hard-coded in the XML file.
+        prioritySpinner = (Spinner) findViewById(R.id.priority);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.priorities, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s.setAdapter(adapter);
+        prioritySpinner.setAdapter(adapter);
         
+        // spinner for category
+        // @TODO - TODO - this is just thrown in here for now.
+        //   we should really have preferences for this stuff
+        //   or even better pull from the database
+        categorySpinner = (Spinner)findViewById(R.id.category);
+        categorySpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categorySpinnerAdapter);
+        for(int i = 0; i < CATEGORIES.length; i++)
+        {
+        	categorySpinnerAdapter.add(CATEGORIES[i]);
+        }
         
+        // text edit for time in minutes
+        timeMins = (EditText) findViewById(R.id.timeMins);
 
+        // date picker (date)
+        datePick = (DatePicker) findViewById(R.id.date);
+        
         // Get the task!
         mCursor = managedQuery(mUri, PROJECTION, null, null, null);
 
@@ -182,6 +239,20 @@ public class TaskEditor extends Activity {
             String taskTitle = mCursor.getString(COLUMN_INDEX_TASK);
             titleEdit.setTextKeepState(taskTitle);
             
+            Integer priority = mCursor.getInt(COLUMN_INDEX_PRIORITY);
+            if(priority > MAX_PRIORITY){ prioritySpinner.setSelection(prioritySpinner.getCount()-1);}
+            else { prioritySpinner.setSelection(priority-1);}
+            
+            Integer category = mCursor.getInt(COLUMN_INDEX_CATEGORY);
+            categorySpinner.setSelection(category - 1);
+            
+            Integer estTime = mCursor.getInt(COLUMN_INDEX_TIME_MIN);
+            timeMins.setTextKeepState(estTime.toString());
+            
+            Long myDateTS = mCursor.getLong(COLUMN_INDEX_DISPLAY_TS);
+            Integer[] myDate = Util.tsLongToYMD(myDateTS);
+            datePick.updateDate(myDate[0], myDate[1], myDate[2]);
+            
             // If we hadn't previously retrieved the original text, do so
             // now.  This allows the user to revert their changes.
             if (myOriginalContent == null) {
@@ -193,11 +264,12 @@ public class TaskEditor extends Activity {
             titleEdit.setText(getText(R.string.error_message));
         }
     }
-
+    
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // Save away the original text, so we still have it if the activity
         // needs to be killed while paused.
+    	if(DEBUG_ON) { Log.d(TAG, "onSaveInstanceState called"); }
         outState.putString(ORIGINAL_CONTENT, myOriginalContent);
     }
 
@@ -205,6 +277,8 @@ public class TaskEditor extends Activity {
     protected void onPause() {
         super.onPause();
 
+        if(DEBUG_ON) { Log.d(TAG, "onPause called"); }
+        
         // The user is going somewhere else, so make sure their current
         // changes are safely saved away in the provider.  We don't need
         // to do this if only editing.
@@ -300,6 +374,7 @@ public class TaskEditor extends Activity {
      * had created it, otherwise reverts to the original text.
      */
     private final void cancelTask() {
+    	if(DEBUG_ON) { Log.d(TAG, "cancelTask called"); }
         if (mCursor != null) {
             if (mState == STATE_EDIT) {
                 // Put the original note text back into the database
