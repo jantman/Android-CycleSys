@@ -31,16 +31,107 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
  * @author Jason Antman <jason@jasonantman.com>
  -->
-<view xmlns:android="http://schemas.android.com/apk/res/android"
-    class="com.jasonantman.cyclesystem.TaskEditor$LinedEditText"
-    android:id="@+id/note"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@android:color/transparent"
-    android:padding="5dip"
-    android:scrollbars="vertical"
-    android:fadingEdge="vertical"
-    android:gravity="top"
-    android:textSize="22sp"
-    android:capitalize="sentences"
-/>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" 
+android:layout_width="fill_parent" 
+android:layout_height="fill_parent" 
+xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<TextView android:id="@+id/TextView01" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_marginTop="5px" 
+		android:layout_marginLeft="5px" 
+		android:layout_alignParentTop="false" 
+		android:layout_alignBaseline="@+id/title" 
+		android:text="Task:"></TextView>
+		
+	<TextView android:id="@+id/TextView02" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:text="Priority:" 
+		android:layout_alignBaseline="@+id/priority" ></TextView>
+		
+	<EditText android:id="@+id/title"
+		android:text="@+id/EditText01" 
+		android:layout_toRightOf="@+id/TextView01" 
+		android:layout_height="wrap_content" 
+		android:layout_width="fill_parent"></EditText>
+
+
+	<Spinner android:id="@+id/priority"
+		android:layout_below="@+id/title" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_alignLeft="@+id/category"></Spinner>
+		
+	<TextView android:id="@+id/TextView03" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:text="Category:" 
+		android:layout_alignBaseline="@+id/category"></TextView>
+		
+	<Spinner android:id="@+id/category"
+		android:layout_below="@+id/priority" 
+		android:layout_toRightOf="@+id/TextView03" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"></Spinner>
+
+	<EditText android:id="@+id/timeMins"
+		android:layout_toRightOf="@+id/TextView03" 
+		android:layout_height="wrap_content" 
+		android:layout_below="@+id/category" 
+		android:layout_width="wrap_content" 
+		android:ems="5" 
+		android:inputType="number" 
+		android:layout_alignLeft="@+id/category"></EditText>
+		
+	<TextView android:id="@+id/TextView06b" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_alignBaseline="@+id/date"
+		android:text="Date:"></TextView>
+		
+	<DatePicker android:id="@+id/date" 
+		android:layout_below="@+id/timeMins" 
+		android:layout_toRightOf="@+id/TextView03" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_alignLeft="@+id/category"></DatePicker>
+		
+	<Button android:id="@+id/cancel"
+		android:layout_height="wrap_content" 
+		android:layout_below="@+id/date" 
+		android:layout_width="wrap_content" 
+		android:text="Cancel" 
+		android:layout_alignParentRight="true" 
+		android:ems="7" 
+		android:layout_alignParentBottom="false"></Button>
+		
+	<Button android:id="@+id/save"
+		android:layout_width="wrap_content" 
+		android:text="Save" 
+		android:layout_below="@+id/date" 
+		android:layout_alignParentLeft="true" 
+		android:layout_height="wrap_content"
+		android:ems="7" 
+		android:layout_alignParentBottom="false"></Button>
+		
+
+		
+	<TextView android:id="@+id/TextView05"
+		android:layout_toRightOf="@+id/timeMins" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:layout_alignBaseline="@+id/timeMins" 
+		android:text="(minutes)" 
+		android:textStyle="italic"></TextView>
+		
+	<TextView android:id="@+id/TextView04b" 
+		android:layout_height="wrap_content" 
+		android:layout_width="wrap_content" 
+		android:text="Est. Time:" 
+		android:layout_alignBaseline="@+id/timeMins"></TextView>
+
+
+</RelativeLayout>

@@ -72,6 +72,9 @@ public class CycleSystem extends ListActivity {
             Tasks.TITLE, // 1
     };
 	
+    // controls debugging-level output
+    public static final boolean DEBUG_ON = true;
+    
     /** The index of the title column */
     private static final int COLUMN_INDEX_TITLE = 1;
     

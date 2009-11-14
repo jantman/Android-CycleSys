@@ -37,19 +37,16 @@ import com.jasonantman.cyclesystem.TaskList.Tasks;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 
 /**
@@ -71,6 +68,9 @@ public class TaskEditor extends Activity {
     /** The index of the task column */
     private static final int COLUMN_INDEX_TASK = 1;
     
+    // controls debugging-level output
+    public static final boolean DEBUG_ON = true;
+    
     // This is our state data that is stored when freezing.
     private static final String ORIGINAL_CONTENT = "origContent";
 
@@ -87,50 +87,22 @@ public class TaskEditor extends Activity {
     private boolean mTaskOnly = false;
     private Uri mUri;
     private Cursor mCursor;
-    private EditText mText;
     private String myOriginalContent;
 
-    /**
-     * A custom EditText that draws lines between each line of text that is displayed.
-     */
-    public static class LinedEditText extends EditText {
-        private Rect mRect;
-        private Paint mPaint;
-
-        // we need this constructor for LayoutInflater
-        public LinedEditText(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            
-            mRect = new Rect();
-            mPaint = new Paint();
-            mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setColor(0x800000FF);
-        }
-        
-        //@Override
-        protected void onDraw(Canvas canvas) {
-            int count = getLineCount();
-            Rect r = mRect;
-            Paint paint = mPaint;
-
-            for (int i = 0; i < count; i++) {
-                int baseline = getLineBounds(i, r);
-
-                canvas.drawLine(r.left, baseline + 1, r.right, baseline + 1, paint);
-            }
-
-            super.onDraw(canvas);
-        }
-    }
+    private EditText titleEdit;
 
     //@Override
     protected void onCreate(Bundle savedInstanceState) {
+    	
+    	if(DEBUG_ON) { Log.d(TAG, "onCreate called"); }
+    	
         super.onCreate(savedInstanceState);
+        
+        if(DEBUG_ON) { Log.d(TAG, "finished calling super()"); }
 
         final Intent intent = getIntent();
 
         // Do some setup based on the action being performed.
-
         final String action = intent.getAction();
         if (Intent.ACTION_EDIT.equals(action)) {
             // Requested to edit: set that state, and the data being edited.
@@ -138,7 +110,6 @@ public class TaskEditor extends Activity {
             mUri = intent.getData();
         } else if (Intent.ACTION_INSERT.equals(action)) {
             // Requested to insert: set that state, and create a new entry
-            // in the container.
             mState = STATE_INSERT;
             mUri = getContentResolver().insert(intent.getData(), null);
 
@@ -165,10 +136,19 @@ public class TaskEditor extends Activity {
         // Set the layout for this activity.  You can find it in res/layout/note_editor.xml
         setContentView(R.layout.task_editor);
         
-        // The text view for our note, identified by its ID in the XML file.
-        mText = (EditText) findViewById(R.id.note);
+        // text edit view for title
+        titleEdit = (EditText) findViewById(R.id.title);
 
-        // Get the note!
+        // spinner for priority
+        Spinner s = (Spinner) findViewById(R.id.priority);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.priorities, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        s.setAdapter(adapter);
+        
+        
+
+        // Get the task!
         mCursor = managedQuery(mUri, PROJECTION, null, null, null);
 
         // If an instance of this activity had previously stopped, we can
@@ -200,7 +180,7 @@ public class TaskEditor extends Activity {
             // but leave the user where they were (retain the cursor position
             // etc).  This version of setText does that for us.
             String taskTitle = mCursor.getString(COLUMN_INDEX_TASK);
-            mText.setTextKeepState(taskTitle);
+            titleEdit.setTextKeepState(taskTitle);
             
             // If we hadn't previously retrieved the original text, do so
             // now.  This allows the user to revert their changes.
@@ -210,7 +190,7 @@ public class TaskEditor extends Activity {
 
         } else {
             setTitle(getText(R.string.error_title));
-            mText.setText(getText(R.string.error_message));
+            titleEdit.setText(getText(R.string.error_message));
         }
     }
 
@@ -229,8 +209,8 @@ public class TaskEditor extends Activity {
         // changes are safely saved away in the provider.  We don't need
         // to do this if only editing.
         if (mCursor != null) {
-            String text = mText.getText().toString();
-            int length = text.length();
+            String title = titleEdit.getText().toString();
+            int length = title.length();
 
             // If this activity is finished, and there is no text, then we
             // do something a little special: simply delete the note entry.
@@ -250,7 +230,7 @@ public class TaskEditor extends Activity {
                     values.put(Tasks.MODIFIED_TS, System.currentTimeMillis());
                 }
 
-                values.put(Tasks.TITLE, text);
+                values.put(Tasks.TITLE, title);
             
                 // Commit all of our changes to persistent storage. When the update completes
                 // the content provider will notify the cursor of the change, which will
@@ -345,7 +325,7 @@ public class TaskEditor extends Activity {
             mCursor.close();
             mCursor = null;
             getContentResolver().delete(mUri, null, null);
-            mText.setText("");
+            titleEdit.setText("");
         }
     }
 }
