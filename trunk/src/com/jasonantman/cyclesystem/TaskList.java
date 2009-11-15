@@ -47,6 +47,11 @@ import android.provider.BaseColumns;
 public final class TaskList {
     public static final String AUTHORITY = "com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider";
 
+    public static final String[] CATEGORIES = new String[] {
+        "Work", // 0
+        "Personal" // 1
+    };
+    
     // This class cannot be instantiated
     private TaskList() {}
     

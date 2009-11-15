@@ -37,7 +37,9 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 /**
  * Lets us change the image and/or background color for the task views
@@ -79,9 +81,9 @@ public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
         	default:  view.setBackgroundColor(COLOR_9); break;
         }
         */
-    	
-    	int nImageIndex = cursor.getColumnIndex(TaskList.Tasks.PRIORITY);
       
+    	// set the icon
+    	int nImageIndex = cursor.getColumnIndex(TaskList.Tasks.PRIORITY);
     	if(nImageIndex==columnIndex)
     	{
     		ImageView typeControl = (ImageView)view;
@@ -92,11 +94,35 @@ public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
         		case 9:  typeControl.setImageResource(ICON_9); break;
         		default:  typeControl.setImageResource(ICON_9); break;
             }
-    		
-          
+            
     		return true;
     	}
 
+ 	
+    	// set the time string
+    	int nTimeIndex = cursor.getColumnIndex(TaskList.Tasks.TIME_MIN);
+    	int TimeMins = cursor.getInt(nTimeIndex);
+    	if(nTimeIndex==columnIndex)
+    	{
+    		TextView timeView = (TextView)view;
+    		CharSequence foo = "";
+    		if(TimeMins < 60){ foo = Integer.toString(TimeMins); }
+    		else{ foo = Integer.toString(TimeMins / 60) +"h " + Integer.toString(TimeMins % 60) + "m";}
+    		timeView.setText(foo);
+    		return true;
+    	}
+    	
+    	// set category string
+    	// set the time string
+    	int nCatIndex = cursor.getColumnIndex(TaskList.Tasks.CATEGORY_ID);
+    	int Cat = cursor.getInt(nCatIndex);
+    	if(nCatIndex==columnIndex)
+    	{
+    		TextView catView = (TextView)view;
+    		catView.setText("(" + TaskList.CATEGORIES[Cat-1] + ")");
+    		return true;
+    	}
+    	
       return false;
     } 
 

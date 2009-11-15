@@ -70,11 +70,6 @@ public class TaskEditor extends Activity {
             Tasks.PRIORITY, // 4
             Tasks.TIME_MIN, //5
     };
-
-    private static final String[] CATEGORIES = new String[] {
-        "Work", // 0
-        "Personal" // 1
-    };
     
     /** The index of the task column */
     private static final int COLUMN_INDEX_TASK = 1;
@@ -125,9 +120,9 @@ public class TaskEditor extends Activity {
      * @return Integer
      */
     private Integer getCategoryIdByName(String name) {
-    	for(Integer i = 0; i < CATEGORIES.length; i++)
+    	for(Integer i = 0; i < TaskList.CATEGORIES.length; i++)
     	{
-    		if(name.equals(CATEGORIES[i])){ return i;}
+    		if(name.equals(TaskList.CATEGORIES[i])){ return i;}
     	}
     	return 1; // DEFAULT CASE
     }
@@ -194,9 +189,9 @@ public class TaskEditor extends Activity {
         categorySpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categorySpinnerAdapter);
-        for(int i = 0; i < CATEGORIES.length; i++)
+        for(int i = 0; i < TaskList.CATEGORIES.length; i++)
         {
-        	categorySpinnerAdapter.add(CATEGORIES[i]);
+        	categorySpinnerAdapter.add(TaskList.CATEGORIES[i]);
         }
         
         // text edit for time in minutes

@@ -71,6 +71,8 @@ public class CycleSystem extends ListActivity {
             Tasks._ID, // 0
             Tasks.TITLE, // 1
             Tasks.PRIORITY, //2
+            Tasks.TIME_MIN, // 3
+            Tasks.CATEGORY_ID, // 4
     };
 	
     // controls debugging-level output
@@ -110,7 +112,7 @@ public class CycleSystem extends ListActivity {
 
         // Used to map task entries from the database to views
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
-        		new String[] { Tasks.TITLE, Tasks._ID, Tasks.PRIORITY }, new int[] { R.id.title, R.id.timeMins, R.id.taskIcon });
+        		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN}, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
     }
 

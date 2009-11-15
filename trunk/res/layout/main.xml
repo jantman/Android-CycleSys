@@ -61,4 +61,15 @@
 		android:gravity="left" 
 		android:layout_alignWithParentIfMissing="true"/>
 		
+	<TextView android:id="@+id/category"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:layout_centerInParent="false" 
+		android:layout_centerHorizontal="false" 
+		android:layout_marginTop="5px" 
+		android:layout_toRightOf="@+id/taskIcon" 
+		android:gravity="left" 
+		android:textStyle="italic"
+		android:layout_below="@+id/title" android:layout_alignWithParentIfMissing="false"/>
+		
 </RelativeLayout>
