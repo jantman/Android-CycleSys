@@ -75,7 +75,7 @@ public final class TaskList {
         /**
          * The default sort order for this table
          */
-        public static final String DEFAULT_SORT_ORDER = "priority DESC";
+        public static final String DEFAULT_SORT_ORDER = "priority ASC,created_ts ASC";
 
         
         /**

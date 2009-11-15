@@ -76,8 +76,9 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 
     // TODO - these should be settings
 	private static final int DEFAULT_PRIORITY = 1;
+	private static final int DEFAULT_CATEGORY = 1;
 	private static final int DEFAULT_TIME_MIN = 5;
-	private static final String DEFAULT_SORT_ORDER = Tasks.DISPLAY_TS + " DESC";
+	private static final String DEFAULT_SORT_ORDER = Tasks.DEFAULT_SORT_ORDER;
     
     /**
      * This class helps open, create, and upgrade the database file.
@@ -182,6 +183,7 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
         }
 
         Long now = Long.valueOf(System.currentTimeMillis());
+        now = now / 1000;
 
         // Make sure that the fields are all set
         if (values.containsKey(Tasks.CREATED_TS) == false) {
@@ -197,7 +199,7 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
         }
         
         if (values.containsKey(Tasks.CATEGORY_ID) == false) {
-            values.put(Tasks.CATEGORY_ID, now);
+            values.put(Tasks.CATEGORY_ID, DEFAULT_CATEGORY);
         }
         
         if (values.containsKey(Tasks.PRIORITY) == false) {

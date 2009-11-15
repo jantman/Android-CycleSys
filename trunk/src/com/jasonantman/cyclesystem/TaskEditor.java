@@ -41,6 +41,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -101,7 +102,6 @@ public class TaskEditor extends Activity {
     private static final int STATE_INSERT = 1;
 
     private int mState;
-    private boolean mTaskOnly = false;
     private Uri mUri;
     private Cursor mCursor;
     private String myOriginalContent;
@@ -204,6 +204,10 @@ public class TaskEditor extends Activity {
 
         // date picker (date)
         datePick = (DatePicker) findViewById(R.id.date);
+        Time t = new Time();
+        t.setToNow();
+        if(DEBUG_ON) { Log.d(TAG, "onCreate: setting datePick to " + t.toString()); }
+        datePick.updateDate(t.year, t.month, t.monthDay);
         
         // Get the task!
         mCursor = managedQuery(mUri, PROJECTION, null, null, null);
@@ -217,11 +221,14 @@ public class TaskEditor extends Activity {
 
     @Override
     protected void onResume() {
+    	if(DEBUG_ON) { Log.d(TAG, "onPResume called"); }
+    	
         super.onResume();
 
         // If we didn't have any trouble retrieving the data, it is now
         // time to get at the stuff.
         if (mCursor != null) {
+        	if(DEBUG_ON) { Log.d(TAG, "onResume mCursor != null"); }
             // Make sure we are at the one and only row in the cursor.
             mCursor.moveToFirst();
 
@@ -249,7 +256,7 @@ public class TaskEditor extends Activity {
             Integer estTime = mCursor.getInt(COLUMN_INDEX_TIME_MIN);
             timeMins.setTextKeepState(estTime.toString());
             
-            Long myDateTS = mCursor.getLong(COLUMN_INDEX_DISPLAY_TS);
+            Long myDateTS = mCursor.getLong(COLUMN_INDEX_DISPLAY_TS) * 1000; // need to cast to millis
             Integer[] myDate = Util.tsLongToYMD(myDateTS);
             datePick.updateDate(myDate[0], myDate[1], myDate[2]);
             
@@ -260,6 +267,7 @@ public class TaskEditor extends Activity {
             }
 
         } else {
+        	if(DEBUG_ON) { Log.d(TAG, "onResume, mCursor IS NULL"); }
             setTitle(getText(R.string.error_title));
             titleEdit.setText(getText(R.string.error_message));
         }
@@ -283,34 +291,53 @@ public class TaskEditor extends Activity {
         // changes are safely saved away in the provider.  We don't need
         // to do this if only editing.
         if (mCursor != null) {
+        	if(DEBUG_ON) { Log.d(TAG, "onPause - mCursor != null"); }
             String title = titleEdit.getText().toString();
-            int length = title.length();
+            
+            int priority = prioritySpinner.getSelectedItemPosition();
+            if(DEBUG_ON) { Log.d(TAG, "prioritySpinner=" + Integer.toString(priority) + " count=" + Integer.toString(prioritySpinner.getCount())); }
+            if(priority == (prioritySpinner.getCount()-1)){ priority = MAX_PRIORITY+1;}
+            else { priority = priority + 1;}
+            if(DEBUG_ON) { Log.d(TAG, "priority=" + Integer.toString(priority) + " MAX_PRIORITY=" + Integer.toString(MAX_PRIORITY)); }
+
+            int category = categorySpinner.getSelectedItemPosition() + 1;
+            
+            String estTime = timeMins.getText().toString();
+            
+            int display_ts = Util.YMDtoTSint(datePick.getYear(), datePick.getMonth(), datePick.getDayOfMonth());
+
 
             // If this activity is finished, and there is no text, then we
-            // do something a little special: simply delete the note entry.
+            // do something a little special: simply delete the task entry.
             // Note that we do this both for editing and inserting...  it
             // would be reasonable to only do it when inserting.
-            if (isFinishing() && (length == 0) && !mTaskOnly) {
+            if (isFinishing() && title.trim().equalsIgnoreCase("")) {
+            	if(DEBUG_ON) { Log.d(TAG, "onPause - isFinishing()"); }
                 setResult(RESULT_CANCELED);
                 deleteTask();
 
             // Get out updates into the provider.
             } else {
+            	if(DEBUG_ON) { Log.d(TAG, "onPause - NOT isFinishing()"); }
                 ContentValues values = new ContentValues();
-
-                // This stuff is only done when working with a full-fledged note.
-                if (!mTaskOnly) {
-                    // Bump the modification time to now.
-                    values.put(Tasks.MODIFIED_TS, System.currentTimeMillis());
-                }
-
+                    
+                // Bump the modification time to now.
+                values.put(Tasks.MODIFIED_TS, System.currentTimeMillis());
                 values.put(Tasks.TITLE, title);
+                values.put(Tasks.PRIORITY, priority);
+                values.put(Tasks.CATEGORY_ID, category);
+                values.put(Tasks.TIME_MIN, estTime);
+                values.put(Tasks.DISPLAY_TS, display_ts);
+                
             
                 // Commit all of our changes to persistent storage. When the update completes
                 // the content provider will notify the cursor of the change, which will
                 // cause the UI to be updated.
                 getContentResolver().update(mUri, values, null, null);
             }
+        }
+        else {
+        	if(DEBUG_ON) { Log.d(TAG, "onPause - mCursor IS NULL"); }
         }
     }
 
@@ -323,11 +350,9 @@ public class TaskEditor extends Activity {
             menu.add(0, REVERT_ID, 0, R.string.menu_revert)
                     .setShortcut('0', 'r')
                     .setIcon(android.R.drawable.ic_menu_revert);
-            if (!mTaskOnly) {
                 menu.add(0, DELETE_ID, 0, R.string.menu_delete)
                         .setShortcut('1', 'd')
                         .setIcon(android.R.drawable.ic_menu_delete);
-            }
 
         // Build the menus that are shown when inserting.
         } else {
@@ -336,17 +361,11 @@ public class TaskEditor extends Activity {
                     .setIcon(android.R.drawable.ic_menu_delete);
         }
 
-        // If we are working on a full task, then append to the
-        // menu items for any other activities that can do stuff with it
-        // as well.  This does a query on the system for any activities that
-        // implement the ALTERNATIVE_ACTION for our data, adding a menu item
-        // for each one that is found.
-        if (!mTaskOnly) {
+
             Intent intent = new Intent(null, getIntent().getData());
             intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
             menu.addIntentOptions(Menu.CATEGORY_ALTERNATIVE, 0, 0,
                     new ComponentName(this, TaskEditor.class), null, intent, 0, null);
-        }
 
         return true;
     }

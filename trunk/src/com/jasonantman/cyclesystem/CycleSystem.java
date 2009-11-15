@@ -106,8 +106,7 @@ public class CycleSystem extends ListActivity {
         
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
-        Cursor cursor = managedQuery(getIntent().getData(), PROJECTION, null, null,
-                Tasks.DEFAULT_SORT_ORDER);
+        Cursor cursor = managedQuery(getIntent().getData(), PROJECTION, null, null, Tasks.DEFAULT_SORT_ORDER);
 
         // Used to map task entries from the database to views
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,

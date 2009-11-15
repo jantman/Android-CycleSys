@@ -53,5 +53,13 @@ public final class Util {
 		a[2] = t.monthDay;
 		return a;
 	}
+
+	public static int YMDtoTSint(int year, int month, int date)
+	{
+		Time t = new Time();
+		t.set(date, month, year);
+		int foo = (int) (t.toMillis(false) / 1000);
+		return foo;
+	}
 	
 }

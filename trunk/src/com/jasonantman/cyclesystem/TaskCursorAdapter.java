@@ -46,7 +46,7 @@ public class TaskCursorAdapter extends SimpleCursorAdapter {
 	c,String[] from, int[] to)
 	    {
 	        super(context, layout, c, from, to);
-
+	        
 	        setViewBinder((SimpleCursorAdapter.ViewBinder) new TaskViewBinder());
 	    }
 	
