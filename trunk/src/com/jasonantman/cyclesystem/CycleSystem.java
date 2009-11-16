@@ -45,13 +45,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.text.format.DateFormat;
+import android.text.format.Time;
 
 
 /**
@@ -81,6 +87,9 @@ public class CycleSystem extends ListActivity {
     /** The index of the title column */
     private static final int COLUMN_INDEX_TITLE = 1;
     
+    // @TODO - TODO - this should be a preference
+    private static final CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
+    
     /**
      * TODO: no idea why these are here
      */
@@ -90,10 +99,22 @@ public class CycleSystem extends ListActivity {
     public static final int MENU_ITEM_HELP = Menu.FIRST + 2;
     public static final int MENU_ITEM_SETTINGS = Menu.FIRST + 3;
     
+    // currently displayed ts
+    private Time t = new Time();
+    private long CURRENT_TS;
+    private CharSequence timeTitleStr = "";
+    
+    // for the header views
+    private TextView headerDate;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // ts of day to display
+        t.setToNow();
+        CURRENT_TS = t.toMillis(false);
+        
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
 
         // If no data was given in the intent (because we were started
@@ -105,6 +126,25 @@ public class CycleSystem extends ListActivity {
 
         // Inform the list we provide context menus for items
         getListView().setOnCreateContextMenuListener(this);
+        
+        // create the header views
+        headerDate = new TextView(this);
+        headerDate.setMaxLines(1);
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        headerDate.setText(timeTitleStr);
+        
+        // center my_textbox
+        
+        //RelativeLayout.LayoutParams params_center = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        //params_center.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        
+        // add my_textbox
+        //l.addView(my_textbox, params_center); 
+        headerDate.setGravity(Gravity.CENTER_HORIZONTAL);
+        // headerDate.setLayoutParams();
+        // headerDate.getLayout();
+        //LayoutParams lp = new LayoutParams(arg0);
+        getListView().addHeaderView(headerDate);
         
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.

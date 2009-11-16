@@ -99,26 +99,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		android:layout_height="wrap_content" 
 		android:layout_alignLeft="@+id/category"></DatePicker>
 		
-	<Button android:id="@+id/cancel"
-		android:layout_height="wrap_content" 
-		android:layout_below="@+id/date" 
-		android:layout_width="wrap_content" 
-		android:text="Cancel" 
-		android:layout_alignParentRight="true" 
-		android:ems="7" 
-		android:layout_alignParentBottom="false"></Button>
-		
-	<Button android:id="@+id/save"
-		android:layout_width="wrap_content" 
-		android:text="Save" 
-		android:layout_below="@+id/date" 
-		android:layout_alignParentLeft="true" 
-		android:layout_height="wrap_content"
-		android:ems="7" 
-		android:layout_alignParentBottom="false"></Button>
-		
-
-		
 	<TextView android:id="@+id/TextView05"
 		android:layout_toRightOf="@+id/timeMins" 
 		android:layout_height="wrap_content" 
@@ -133,5 +113,18 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		android:text="Est. Time:" 
 		android:layout_alignBaseline="@+id/timeMins"></TextView>
 
+	<Button android:id="@+id/moveOne"
+		android:layout_height="wrap_content" 
+		android:layout_below="@+id/date" 
+		android:layout_width="wrap_content" 
+		android:text="Move to Next Day" 
+		android:layout_centerHorizontal="true" ></Button>
+		
+	<Button android:id="@+id/moveNextWork"
+		android:layout_width="wrap_content" 
+		android:text="Move to Next Work Day" 
+		android:layout_below="@+id/moveOne" 
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true" ></Button>
 
 </RelativeLayout>
