@@ -33,7 +33,7 @@
 package com.jasonantman.cyclesystem;
 
 import android.content.pm.PackageManager;
-import android.text.format.Time; 
+import android.text.format.Time;  
 
 /**
  * Just exists to get the SVN rev numbers into the program itself.

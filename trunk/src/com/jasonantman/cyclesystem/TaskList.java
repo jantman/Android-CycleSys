@@ -49,7 +49,8 @@ public final class TaskList {
 
     public static final String[] CATEGORIES = new String[] {
         "Work", // 0
-        "Personal" // 1
+        "Personal", // 1
+        "Other", // 2
     };
     
     // This class cannot be instantiated
