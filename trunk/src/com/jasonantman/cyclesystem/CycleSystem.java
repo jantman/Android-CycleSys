@@ -54,8 +54,11 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector.OnGestureListener;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.MotionEvent;
@@ -66,7 +69,7 @@ import android.view.MotionEvent;
  * provided in the intent if there is one, otherwise defaults to displaying the
  * contents of the {@link NotePadProvider}
  */
-public class CycleSystem extends ListActivity implements OnGestureListener {
+public class CycleSystem extends ListActivity {
     /** Called when the activity is first created. */
     
 	private static final String TAG = "CycleSystem";
@@ -113,6 +116,8 @@ public class CycleSystem extends ListActivity implements OnGestureListener {
     
     // for the header views
     private TextView headerDate;
+    private Spinner categorySpinner;
+    private ArrayAdapter<CharSequence> categorySpinnerAdapter;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,19 +144,38 @@ public class CycleSystem extends ListActivity implements OnGestureListener {
         headerDate.setMaxLines(1);
         timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
         headerDate.setText(timeTitleStr);
-        
-        // center my_textbox
-        
-        //RelativeLayout.LayoutParams params_center = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        //params_center.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        
-        // add my_textbox
-        //l.addView(my_textbox, params_center); 
         headerDate.setGravity(Gravity.CENTER_HORIZONTAL);
-        // headerDate.setLayoutParams();
-        // headerDate.getLayout();
-        //LayoutParams lp = new LayoutParams(arg0);
         getListView().addHeaderView(headerDate);
+        
+        // spinner for category
+        // @TODO - TODO - this is just thrown in here for now.
+        //   we should really have preferences for this stuff
+        //   or even better pull from the database
+        categorySpinner = new Spinner(this);
+        categorySpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
+        categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categorySpinnerAdapter);
+        categorySpinnerAdapter.add("--All--");
+        categorySpinner.setOnItemSelectedListener(
+                new  AdapterView.OnItemSelectedListener() {           
+                	//@Override
+                	public void onItemSelected(AdapterView<?> parent, 
+                		View view, int position, long id) {
+                		//selectItem(position);
+                		selectCategory(position);
+                	}
+                	//@Override
+                	public void onNothingSelected(AdapterView<?> parent) {
+
+                	}
+                });
+
+        for(int i = 0; i < TaskList.CATEGORIES.length; i++)
+        {
+        	categorySpinnerAdapter.add(TaskList.CATEGORIES[i]);
+        }
+        //categorySpinner.
+        getListView().addHeaderView(categorySpinner);
         
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
@@ -337,66 +361,38 @@ public class CycleSystem extends ListActivity implements OnGestureListener {
             startActivity(new Intent(Intent.ACTION_EDIT, uri));
         }
     }
+    
+    /**
+     * Update category filter
+     * @param id
+     */
+    protected void selectCategory(int id)
+    {
+    	//
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, " selectCategory(" + Integer.toString(id) + ")"); }
+    	
+    	/*
+    	         Intent intent = getIntent();
+        if (intent.getData() == null) {
+            intent.setData(Tasks.CONTENT_URI);
+        }
+        */
+        
+    	Cursor cursor;
+    	if(id == 0)
+    	{
+    		cursor = managedQuery(getIntent().getData(), PROJECTION, null, null, Tasks.DEFAULT_SORT_ORDER);
+    	}
+    	else
+    	{
+    		cursor = managedQuery(getIntent().getData(), PROJECTION, Tasks.CATEGORY_ID + "=" + Integer.toString(id), null, Tasks.DEFAULT_SORT_ORDER);
+    	}
+    	
+        // Used to map task entries from the database to views
+        TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
+        		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
+        setListAdapter(adapter);
+    	
+    }
 
-	/* (non-Javadoc)
-	 * @see android.view.View.OnClickListener#onClick(android.view.View)
-	 */
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onClick()"); }
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onDown(android.view.MotionEvent)
-	 */
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onDown()"); }
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onFling(android.view.MotionEvent, android.view.MotionEvent, float, float)
-	 */
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling()"); }
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onLongPress(android.view.MotionEvent)
-	 */
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onLongPress()"); }
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onScroll(android.view.MotionEvent, android.view.MotionEvent, float, float)
-	 */
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onScroll()"); }
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onShowPress(android.view.MotionEvent)
-	 */
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onShowPress()"); }
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see android.view.GestureDetector.OnGestureListener#onSingleTapUp(android.view.MotionEvent)
-	 */
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onSingleTapUp()"); }
-		return false;
-	}
 }
