@@ -39,25 +39,26 @@ import com.jasonantman.cyclesystem.TaskList.Tasks;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewGroup.LayoutParams;
+import android.view.GestureDetector.OnGestureListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.text.format.DateFormat;
 import android.text.format.Time;
+import android.view.MotionEvent;
 
 
 /**
@@ -65,10 +66,14 @@ import android.text.format.Time;
  * provided in the intent if there is one, otherwise defaults to displaying the
  * contents of the {@link NotePadProvider}
  */
-public class CycleSystem extends ListActivity {
+public class CycleSystem extends ListActivity implements OnGestureListener {
     /** Called when the activity is first created. */
     
 	private static final String TAG = "CycleSystem";
+	
+	// stuff for gestures
+    private GestureDetector gestureDetector;
+    View.OnTouchListener gestureListener;
 	
     /**
      * The columns we are interested in from the database
@@ -79,13 +84,11 @@ public class CycleSystem extends ListActivity {
             Tasks.PRIORITY, //2
             Tasks.TIME_MIN, // 3
             Tasks.CATEGORY_ID, // 4
+            Tasks.IS_FINISHED, // 5
     };
 	
     // controls debugging-level output
     public static final boolean DEBUG_ON = true;
-    
-    /** The index of the title column */
-    private static final int COLUMN_INDEX_TITLE = 1;
     
     // @TODO - TODO - this should be a preference
     private static final CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
@@ -94,10 +97,14 @@ public class CycleSystem extends ListActivity {
      * TODO: no idea why these are here
      */
     // Menu item ids
-    public static final int MENU_ITEM_DELETE = Menu.FIRST;
-    public static final int MENU_ITEM_INSERT = Menu.FIRST + 1;
-    public static final int MENU_ITEM_HELP = Menu.FIRST + 2;
-    public static final int MENU_ITEM_SETTINGS = Menu.FIRST + 3;
+    public static final int MENU_ITEM_INSERT = Menu.FIRST;
+    public static final int MENU_ITEM_GOTO = Menu.FIRST + 1;
+    public static final int MENU_ITEM_MANAGE = Menu.FIRST + 2;
+    public static final int MENU_ITEM_PURGE = Menu.FIRST + 3;
+    public static final int MENU_ITEM_HELP = Menu.FIRST + 4;
+    public static final int MENU_ITEM_SETTINGS = Menu.FIRST + 5;
+    public static final int CONTEXT_ITEM_FINISH = Menu.FIRST + 6;
+    public static final int CONTEXT_ITEM_EDIT = Menu.FIRST + 7;
     
     // currently displayed ts
     private Time t = new Time();
@@ -152,27 +159,53 @@ public class CycleSystem extends ListActivity {
 
         // Used to map task entries from the database to views
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
-        		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN}, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
+        		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
+        
+        // Gesture detection
+        gestureDetector = new GestureDetector(new CycleSysGestureListener());
+        gestureListener = new View.OnTouchListener() {
+             public boolean onTouch(View v, MotionEvent event) {
+                 if (gestureDetector.onTouchEvent(event)) {
+                     return true;
+                 }
+                 return false;
+             }
+         };
+         
+         this.getListView().setOnTouchListener(gestureListener);
+         // end Gesture detection
+        
     }
 
     //@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
+        
         // This is our one standard application action -- inserting a
         // new note into the list.
         menu.add(0, MENU_ITEM_INSERT, 0, R.string.menu_insert)
                 .setShortcut('3', 'a')
                 .setIcon(android.R.drawable.ic_menu_add);
 
+        menu.add(0, MENU_ITEM_GOTO, 0, R.string.menu_goto)
+        	.setShortcut('4', 'g')
+        	.setIcon(android.R.drawable.ic_menu_day);  
+        
+        menu.add(0, MENU_ITEM_MANAGE, 0, R.string.menu_manage)
+        	.setShortcut('6', 'm')
+        	.setIcon(android.R.drawable.ic_menu_agenda);  
+        
+        menu.add(0, MENU_ITEM_PURGE, 0, R.string.menu_purge)
+        	.setShortcut('7', 'p')
+        	.setIcon(android.R.drawable.ic_menu_delete);  
+        
         menu.add(0, MENU_ITEM_HELP, 0, R.string.menu_help)
-        .setShortcut('4', 'h')
-        .setIcon(android.R.drawable.ic_menu_help);
+        	.setShortcut('0', 'h')
+        	.setIcon(android.R.drawable.ic_menu_help);
 
         menu.add(0, MENU_ITEM_SETTINGS, 0, R.string.menu_settings)
-        .setShortcut('7', 's')
-        .setIcon(android.R.drawable.ic_menu_preferences);
+        	.setIcon(android.R.drawable.ic_menu_preferences);
         
         // Generate any additional actions that can be performed on the
         // overall list.  In a normal install, there are no additional
@@ -229,6 +262,10 @@ public class CycleSystem extends ListActivity {
             // Launch activity to insert a new item
             startActivity(new Intent(Intent.ACTION_INSERT, getIntent().getData()));
             return true;
+        case MENU_ITEM_PURGE:
+        	// Purge the finished items
+            getContentResolver().delete(getIntent().getData(), Tasks.IS_FINISHED + "==1", null);
+        	return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -250,10 +287,11 @@ public class CycleSystem extends ListActivity {
         }
 
         // Setup the menu header
-        menu.setHeaderTitle(cursor.getString(COLUMN_INDEX_TITLE));
+        menu.setHeaderTitle(cursor.getString(cursor.getColumnIndex(Tasks.TITLE)));
 
         // Add a menu item to delete the note
-        menu.add(0, MENU_ITEM_DELETE, 0, R.string.menu_delete);
+        menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
+        menu.add(0, CONTEXT_ITEM_EDIT, 1, R.string.menu_edit);
     }
         
     @Override
@@ -267,10 +305,12 @@ public class CycleSystem extends ListActivity {
         }
 
         switch (item.getItemId()) {
-            case MENU_ITEM_DELETE: {
-                // Delete the note that the context menu is for
+            case CONTEXT_ITEM_FINISH: {
+                // Update the task that the context menu is for
                 Uri noteUri = ContentUris.withAppendedId(getIntent().getData(), info.id);
-                getContentResolver().delete(noteUri, null, null);
+                ContentValues values = new ContentValues();
+                values.put(Tasks.IS_FINISHED, 1);
+                getContentResolver().update(noteUri, values, null, null);
                 return true;
             }
         }
@@ -291,4 +331,66 @@ public class CycleSystem extends ListActivity {
             startActivity(new Intent(Intent.ACTION_EDIT, uri));
         }
     }
+
+	/* (non-Javadoc)
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onClick()"); }
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onDown(android.view.MotionEvent)
+	 */
+	public boolean onDown(MotionEvent e) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onDown()"); }
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onFling(android.view.MotionEvent, android.view.MotionEvent, float, float)
+	 */
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling()"); }
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onLongPress(android.view.MotionEvent)
+	 */
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onLongPress()"); }
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onScroll(android.view.MotionEvent, android.view.MotionEvent, float, float)
+	 */
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onScroll()"); }
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onShowPress(android.view.MotionEvent)
+	 */
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onShowPress()"); }
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see android.view.GestureDetector.OnGestureListener#onSingleTapUp(android.view.MotionEvent)
+	 */
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onSingleTapUp()"); }
+		return false;
+	}
 }

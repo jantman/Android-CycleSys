@@ -40,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.graphics.Paint;
 
 /**
  * Lets us change the image and/or background color for the task views
@@ -101,9 +102,9 @@ public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
  	
     	// set the time string
     	int nTimeIndex = cursor.getColumnIndex(TaskList.Tasks.TIME_MIN);
-    	int TimeMins = cursor.getInt(nTimeIndex);
     	if(nTimeIndex==columnIndex)
     	{
+    		int TimeMins = cursor.getInt(nTimeIndex);
     		TextView timeView = (TextView)view;
     		CharSequence foo = "";
     		if(TimeMins < 60){ foo = Integer.toString(TimeMins); }
@@ -113,13 +114,28 @@ public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
     	}
     	
     	// set category string
-    	// set the time string
     	int nCatIndex = cursor.getColumnIndex(TaskList.Tasks.CATEGORY_ID);
-    	int Cat = cursor.getInt(nCatIndex);
     	if(nCatIndex==columnIndex)
     	{
+    		int Cat = cursor.getInt(nCatIndex);
     		TextView catView = (TextView)view;
     		catView.setText("(" + TaskList.CATEGORIES[Cat-1] + ")");
+    		return true;
+    	}
+    	
+    	// set the text itself
+    	int nTitleIndex = cursor.getColumnIndex(TaskList.Tasks.TITLE);
+    	if(nTitleIndex==columnIndex)
+    	{
+    		int is_finished = cursor.getInt(cursor.getColumnIndex(TaskList.Tasks.IS_FINISHED));
+    		String title = cursor.getString(nTitleIndex);
+    		TextView titleView = (TextView)view;
+    		titleView.setText(title);
+    		// got the strikethrough stuff from: http://jsharkey.org/blog/2008/09/15/crossing-things-off-lists-in-android-09-sdk/
+    		if(is_finished == 1)
+    		{
+    			titleView.setPaintFlags(titleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    		}
     		return true;
     	}
     	

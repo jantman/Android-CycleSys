@@ -149,6 +149,36 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 	}
 
 	/* (non-Javadoc)
+	 * Mark a task as finished
+	 * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+	 */
+	//@Override
+	public int markFinished(Uri uri, String where, String[] whereArgs) {
+        SQLiteDatabase db = myOpenHelper.getWritableDatabase();
+        
+        ContentValues values = new ContentValues();
+        values.put(Tasks.IS_FINISHED, 1);
+        
+        int count;
+        switch (sUriMatcher.match(uri)) {
+        case TASKS:
+            count = db.update(TASKS_TABLE_NAME, values, where, whereArgs);
+            break;
+
+        case TASK_ID:
+            String taskId = uri.getPathSegments().get(1);
+            count = db.update(TASKS_TABLE_NAME, values, Tasks._ID + "=" + taskId + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+        
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
+	}
+	
+	/* (non-Javadoc)
 	 * @see android.content.ContentProvider#getType(android.net.Uri)
 	 */
     @Override
