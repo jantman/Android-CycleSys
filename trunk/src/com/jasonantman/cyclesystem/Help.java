@@ -32,43 +32,43 @@
  */
 package com.jasonantman.cyclesystem;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.text.format.Time;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 /**
- * General utility functions for CycleSystem
- * @param ts Long timestamp
- * @return Integer[3] like [year, month, date]
  * @author jantman
  *
  */
-public final class Util {
-
-	public static final String SVNrev = "$LastChangedRevision$";
+public class Help extends Activity {
+	private static final String TAG = "Help";
 	
-	public static Integer[] tsLongToYMD(Long ts)
-	{
-		Time t = new Time();
-		t.set(ts);
-		Integer[] a = new Integer[3];
-		a[0] = t.year;
-		a[1] = t.month;
-		a[2] = t.monthDay;
-		return a;
-	}
-
-	public static int YMDtoTSint(int year, int month, int date)
-	{
-		Time t = new Time();
-		t.set(date, month, year);
-		int foo = (int) (t.toMillis(false) / 1000);
-		return foo;
-	}
+	TextView t;
 	
-	public static String getSvnRev()
-	{
-		String foo = SVNrev;
-		
-		return foo;
-	}
+    protected void onCreate(Bundle savedInstanceState) {
+    	
+        super.onCreate(savedInstanceState);
+
+        final Intent intent = getIntent();
+
+        // Set the layout for this activity.  You can find it in res/layout/note_editor.xml
+        setContentView(R.layout.help);
+        
+        // text edit view for title
+        //titleEdit = (EditText) findViewById(R.id.title);
+        t = (TextView) findViewById(R.id.TextView02);
+        CharSequence text = "Copyright 2009 Jason Antman. Licensed under GNU GPLv3.\n\n";
+        text = text + "Thanks to Tom Limoncelli for writing the book that sparked all of this - Time Management for System Administrators.\n\n";
+        text = text + "For help, to report bugs, or to get the source: http://cyclesys.jasonantman.com\n\n";
+        text = text + "SVN revision: " + Util.SVNrev;
+        t.setText(text);
+    }
 	
 }
