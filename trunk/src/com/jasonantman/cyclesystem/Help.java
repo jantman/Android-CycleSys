@@ -34,6 +34,9 @@ package com.jasonantman.cyclesystem;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
@@ -67,8 +70,40 @@ public class Help extends Activity {
         CharSequence text = "Copyright 2009 Jason Antman. Licensed under GNU GPLv3.\n\n";
         text = text + "Thanks to Tom Limoncelli for writing the book that sparked all of this - Time Management for System Administrators.\n\n";
         text = text + "For help, to report bugs, or to get the source: http://cyclesys.jasonantman.com\n\n";
-        text = text + "SVN revision: " + Util.SVNrev;
+        text = text + "SVN revision: " + TouchMe.getSvnRev() + "\n";
+        text = text + "Version Code: " + getVersionCode() + "\n";
+        text = text + "Version Name: " + getVersionName() + "\n";
         t.setText(text);
     }
+    
+	private String getVersionCode()
+	{
+        PackageManager pm = getPackageManager();
+        try {
+            //---get the package info---
+            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cyclesystem", 0);
+            //---display the versioncode---        
+            return Integer.toString(pi.versionCode);
+        } catch (NameNotFoundException e) {
+            // TODO Auto-generated catch block
+            return "Unknown (program error)";
+        }
+
+	}
+	
+	private String getVersionName()
+	{
+        PackageManager pm = getPackageManager();
+        try {
+            //---get the package info---
+            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cyclesystem", 0);
+            //---display the versioncode---        
+            return pi.versionName;
+        } catch (NameNotFoundException e) {
+            // TODO Auto-generated catch block
+            return "Unknown (program error)";
+        }
+
+	}
 	
 }

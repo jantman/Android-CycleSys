@@ -63,8 +63,7 @@
             android:theme="@android:style/Theme.Light"
             android:label="@string/title_task"
             android:screenOrientation="sensor"
-            android:configChanges="keyboardHidden|orientation"
-        >
+            android:configChanges="keyboardHidden|orientation" >
             <!-- This filter says that we can view or edit the data of a single task -->
             <intent-filter android:label="@string/resolve_edit">
                 <action android:name="android.intent.action.VIEW" />
@@ -81,6 +80,16 @@
                 <data android:mimeType="vnd.android.cursor.dir/vnd.jasonantman.task" />
             </intent-filter>
 
+        </activity>
+
+        <activity android:name="Help"
+            android:theme="@android:style/Theme.Light"
+            android:label="@string/title_help"
+            android:screenOrientation="sensor"
+            android:configChanges="keyboardHidden|orientation" >
+            <intent-filter>
+            	<action android:name="android.intent.action.SYSTEM_TUTORIAL"></action>
+			</intent-filter>
         </activity>
 
     </application>

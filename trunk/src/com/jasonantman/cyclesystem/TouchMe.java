@@ -36,30 +36,25 @@ import android.content.pm.PackageManager;
 import android.text.format.Time;
 
 /**
- * General utility functions for CycleSystem
+ * Just exists to get the SVN rev numbers into the program itself.
+ * Should be "touched" before each SVN commit.
  * @param ts Long timestamp
  * @return Integer[3] like [year, month, date]
  * @author jantman
  *
  */
-public final class Util {
-	
-	public static Integer[] tsLongToYMD(Long ts)
-	{
-		Time t = new Time();
-		t.set(ts);
-		Integer[] a = new Integer[3];
-		a[0] = t.year;
-		a[1] = t.month;
-		a[2] = t.monthDay;
-		return a;
-	}
+public final class TouchMe {
 
-	public static int YMDtoTSint(int year, int month, int date)
+	public static final String SVNrev = "$LastChangedRevision$";
+	
+	public static String getSvnRev()
 	{
-		Time t = new Time();
-		t.set(date, month, year);
-		int foo = (int) (t.toMillis(false) / 1000);
+		String foo = SVNrev;
+		foo = foo.replace('$', ' ');
+		foo = foo.substring(foo.indexOf(":")+1);
+		foo = foo.trim();
+//		foo = foo.substring(0, foo.indexOf(" "));
+//		foo = foo.trim();
 		return foo;
 	}
 	

@@ -54,6 +54,7 @@
 	<string name="title_edit">Edit Task</string>
 	<string name="title_add">Add Task</string>
 	<string name="title_task">Task</string>
+	<string name="title_help">Help / About</string>
 
 	<string name="error_title">Error</string>
 	<string name="error_message">Error loading task</string>

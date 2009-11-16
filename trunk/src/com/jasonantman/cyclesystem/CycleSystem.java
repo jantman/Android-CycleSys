@@ -266,6 +266,12 @@ public class CycleSystem extends ListActivity implements OnGestureListener {
         	// Purge the finished items
             getContentResolver().delete(getIntent().getData(), Tasks.IS_FINISHED + "==1", null);
         	return true;
+        case MENU_ITEM_HELP:
+        	//startActivity(new Intent(Intent.ACTION_SYSTEM_TUTORIAL)); // total hack
+        	Intent i = new Intent(this, Help.class);
+        	startActivity(i);
+
+        	return true;
         }
         return super.onOptionsItemSelected(item);
     }
