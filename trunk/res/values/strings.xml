@@ -58,4 +58,7 @@
 
 	<string name="error_title">Error</string>
 	<string name="error_message">Error loading task</string>
+	
+	<string name="alert_notimplemented">NOTICE - this function has not been implemented.</string>
+	<string name="alert_notimplemented_title">Not Implemented.</string>
 </resources>

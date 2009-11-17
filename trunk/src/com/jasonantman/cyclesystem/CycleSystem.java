@@ -36,6 +36,7 @@ package com.jasonantman.cyclesystem;
 
 import com.jasonantman.cyclesystem.TaskList.Tasks;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -292,7 +293,15 @@ public class CycleSystem extends ListActivity {
         	//startActivity(new Intent(Intent.ACTION_SYSTEM_TUTORIAL)); // total hack
         	Intent i = new Intent(this, Help.class);
         	startActivity(i);
-
+        	return true;
+        case MENU_ITEM_GOTO:
+        	showNotImplementedDialog();
+        	return true;
+        case MENU_ITEM_MANAGE:
+        	showNotImplementedDialog();
+        	return true;
+        case MENU_ITEM_SETTINGS:
+        	showNotImplementedDialog();
         	return true;
         }
         return super.onOptionsItemSelected(item);
@@ -341,6 +350,10 @@ public class CycleSystem extends ListActivity {
                 values.put(Tasks.IS_FINISHED, 1);
                 getContentResolver().update(noteUri, values, null, null);
                 return true;
+            }
+            case CONTEXT_ITEM_EDIT: {
+            	showNotImplementedDialog();
+            	return true;
             }
         }
         return false;
@@ -392,6 +405,21 @@ public class CycleSystem extends ListActivity {
         		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
     	
+    }
+    
+    /**
+     * Simple method to display an alert that the item isn't implemented.
+     * @todo - TODO - remove this in production code
+     * got this from http://moazzam-khan.com/blog/?p=134
+     */
+    protected void showNotImplementedDialog()
+    {
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(R.string.alert_notimplemented);
+        dlgAlert.setTitle(R.string.alert_notimplemented_title);
+        dlgAlert.setPositiveButton("OK", null);
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 
 }

@@ -40,8 +40,9 @@ COMMIT CHECKLIST:
 BUILD CHECKLIST:
 1. Test!
 2. Turn off logging and debugging and clean up data/files (set DEBUG = false)
-3. Remove the android:debuggable="true" attribute from the <application> element of the manifest.
-4. Update application versionCode and versionName in manifest.
-5. Compile
-6. APL Export Wizard - sign, zipalign
+3. Grep for all "TODO" lines
+4. Remove the android:debuggable="true" attribute from the <application> element of the manifest.
+5. Update application versionCode and versionName in manifest.
+6. Compile
+7. APL Export Wizard - sign, zipalign
 

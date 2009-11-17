@@ -35,6 +35,7 @@ package com.jasonantman.cyclesystem;
 import com.jasonantman.cyclesystem.TaskList.Tasks;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -45,7 +46,9 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -109,6 +112,10 @@ public class TaskEditor extends Activity {
     private EditText timeMins;
     // date selector
     private DatePicker datePick;
+    
+    // move buttons
+    private Button button_moveOne;
+    private Button button_moveWork;
     
     /**
      * Find the id of a category by name
@@ -203,6 +210,22 @@ public class TaskEditor extends Activity {
         t.setToNow();
         if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onCreate: setting datePick to " + t.toString()); }
         datePick.updateDate(t.year, t.month, t.monthDay);
+        
+        // move to next day button
+        button_moveOne = (Button) findViewById(R.id.moveOne);
+        button_moveOne.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	showNotImplementedDialog();
+            }
+        });
+
+        // move to next work day button
+        button_moveWork = (Button) findViewById(R.id.moveNextWork);
+        button_moveWork.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	showNotImplementedDialog();
+            }
+        });
         
         // Get the task!
         mCursor = managedQuery(mUri, PROJECTION, null, null, null);
@@ -416,5 +439,20 @@ public class TaskEditor extends Activity {
             getContentResolver().delete(mUri, null, null);
             titleEdit.setText("");
         }
+    }
+    
+    /**
+     * Simple method to display an alert that the item isn't implemented.
+     * @todo - TODO - remove this in production code
+     * got this from http://moazzam-khan.com/blog/?p=134
+     */
+    protected void showNotImplementedDialog()
+    {
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(R.string.alert_notimplemented);
+        dlgAlert.setTitle(R.string.alert_notimplemented_title);
+        dlgAlert.setPositiveButton("OK", null);
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 }
