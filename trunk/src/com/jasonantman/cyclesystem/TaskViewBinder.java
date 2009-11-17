@@ -34,10 +34,8 @@ package com.jasonantman.cyclesystem;
 
 import android.database.Cursor;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.graphics.Paint;
@@ -48,10 +46,7 @@ import android.graphics.Paint;
  *
  */
 public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
-
-    // controls debugging-level output
-    public static final boolean DEBUG_ON = true;
-    
+   
     public static final String TAG = "TaskViewBinder";
     
     public static final int COLOR_1 = Color.argb(60, 255, 0, 0); 

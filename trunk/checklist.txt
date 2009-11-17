@@ -25,41 +25,23 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
 
-import android.text.format.Time;
+COMMIT CHECKLIST:
+1. Change src/com.jasonantman.cyclesystem/TouchMe.java to update SVN keywords for revision.
+2. Commit, be sure to reference Eventum issue numbers.
+3. Create Time Tracking entries in Eventum.
 
-/**
- * General utility functions for CycleSystem
- * @param ts Long timestamp
- * @return Integer[3] like [year, month, date]
- * @author jantman
- *
- */
-public final class Util {
-	
-	public static Integer[] tsLongToYMD(Long ts)
-	{
-		Time t = new Time();
-		t.set(ts);
-		Integer[] a = new Integer[3];
-		a[0] = t.year;
-		a[1] = t.month;
-		a[2] = t.monthDay;
-		return a;
-	}
 
-	public static int YMDtoTSint(int year, int month, int date)
-	{
-		Time t = new Time();
-		t.set(date, month, year);
-		int foo = (int) (t.toMillis(false) / 1000);
-		return foo;
-	}
-	
-}
+BUILD CHECKLIST:
+1. Test!
+2. Turn off logging and debugging and clean up data/files (set DEBUG = false)
+3. Remove the android:debuggable="true" attribute from the <application> element of the manifest.
+4. Update application versionCode and versionName in manifest.
+5. Compile
+6. APL Export Wizard - sign, zipalign
+

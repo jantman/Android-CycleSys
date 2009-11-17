@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleSystem      http://CycleSystem.jasonantman.com                  |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,15 +25,12 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                           $   |
+ * | $HeadURL::                                                       $   |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
 package com.jasonantman.cyclesystem;
-
-import android.content.pm.PackageManager;
-import android.text.format.Time;  
 
 /**
  * Just exists to get the SVN rev numbers into the program itself.

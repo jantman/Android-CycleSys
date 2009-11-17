@@ -78,9 +78,6 @@ public class TaskEditor extends Activity {
     private static final int COLUMN_INDEX_PRIORITY = 4;
     private static final int COLUMN_INDEX_TIME_MIN = 5;
     
-    // controls debugging-level output
-    public static final boolean DEBUG_ON = true;
-    
     // anything past this number is treated as the last priority option
     public static final int MAX_PRIORITY = 3;
     
@@ -119,6 +116,8 @@ public class TaskEditor extends Activity {
      * @param name name of the category
      * @return Integer
      */
+    
+    /*
     private Integer getCategoryIdByName(String name) {
     	for(Integer i = 0; i < TaskList.CATEGORIES.length; i++)
     	{
@@ -126,11 +125,12 @@ public class TaskEditor extends Activity {
     	}
     	return 1; // DEFAULT CASE
     }
+    */
     
     //@Override
     protected void onCreate(Bundle savedInstanceState) {
     	
-    	if(DEBUG_ON) { Log.d(TAG, "onCreate called"); }
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onCreate called"); }
     	
         super.onCreate(savedInstanceState);
 
@@ -186,7 +186,7 @@ public class TaskEditor extends Activity {
         //   we should really have preferences for this stuff
         //   or even better pull from the database
         categorySpinner = (Spinner)findViewById(R.id.category);
-        categorySpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
+        categorySpinnerAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categorySpinnerAdapter);
         for(int i = 0; i < TaskList.CATEGORIES.length; i++)
@@ -201,7 +201,7 @@ public class TaskEditor extends Activity {
         datePick = (DatePicker) findViewById(R.id.date);
         Time t = new Time();
         t.setToNow();
-        if(DEBUG_ON) { Log.d(TAG, "onCreate: setting datePick to " + t.toString()); }
+        if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onCreate: setting datePick to " + t.toString()); }
         datePick.updateDate(t.year, t.month, t.monthDay);
         
         // Get the task!
@@ -216,14 +216,14 @@ public class TaskEditor extends Activity {
 
     @Override
     protected void onResume() {
-    	if(DEBUG_ON) { Log.d(TAG, "onPResume called"); }
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPResume called"); }
     	
         super.onResume();
 
         // If we didn't have any trouble retrieving the data, it is now
         // time to get at the stuff.
         if (mCursor != null) {
-        	if(DEBUG_ON) { Log.d(TAG, "onResume mCursor != null"); }
+        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onResume mCursor != null"); }
             // Make sure we are at the one and only row in the cursor.
             mCursor.moveToFirst();
 
@@ -262,7 +262,7 @@ public class TaskEditor extends Activity {
             }
 
         } else {
-        	if(DEBUG_ON) { Log.d(TAG, "onResume, mCursor IS NULL"); }
+        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onResume, mCursor IS NULL"); }
             setTitle(getText(R.string.error_title));
             titleEdit.setText(getText(R.string.error_message));
         }
@@ -272,7 +272,7 @@ public class TaskEditor extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         // Save away the original text, so we still have it if the activity
         // needs to be killed while paused.
-    	if(DEBUG_ON) { Log.d(TAG, "onSaveInstanceState called"); }
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onSaveInstanceState called"); }
         outState.putString(ORIGINAL_CONTENT, myOriginalContent);
     }
 
@@ -280,20 +280,20 @@ public class TaskEditor extends Activity {
     protected void onPause() {
         super.onPause();
 
-        if(DEBUG_ON) { Log.d(TAG, "onPause called"); }
+        if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause called"); }
         
         // The user is going somewhere else, so make sure their current
         // changes are safely saved away in the provider.  We don't need
         // to do this if only editing.
         if (mCursor != null) {
-        	if(DEBUG_ON) { Log.d(TAG, "onPause - mCursor != null"); }
+        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - mCursor != null"); }
             String title = titleEdit.getText().toString();
             
             int priority = prioritySpinner.getSelectedItemPosition();
-            if(DEBUG_ON) { Log.d(TAG, "prioritySpinner=" + Integer.toString(priority) + " count=" + Integer.toString(prioritySpinner.getCount())); }
+            if(CycleSystem.DEBUG_ON) { Log.d(TAG, "prioritySpinner=" + Integer.toString(priority) + " count=" + Integer.toString(prioritySpinner.getCount())); }
             if(priority == (prioritySpinner.getCount()-1)){ priority = MAX_PRIORITY+1;}
             else { priority = priority + 1;}
-            if(DEBUG_ON) { Log.d(TAG, "priority=" + Integer.toString(priority) + " MAX_PRIORITY=" + Integer.toString(MAX_PRIORITY)); }
+            if(CycleSystem.DEBUG_ON) { Log.d(TAG, "priority=" + Integer.toString(priority) + " MAX_PRIORITY=" + Integer.toString(MAX_PRIORITY)); }
 
             int category = categorySpinner.getSelectedItemPosition() + 1;
             
@@ -307,13 +307,13 @@ public class TaskEditor extends Activity {
             // Note that we do this both for editing and inserting...  it
             // would be reasonable to only do it when inserting.
             if (isFinishing() && title.trim().equalsIgnoreCase("")) {
-            	if(DEBUG_ON) { Log.d(TAG, "onPause - isFinishing()"); }
+            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - isFinishing()"); }
                 setResult(RESULT_CANCELED);
                 deleteTask();
 
             // Get out updates into the provider.
             } else {
-            	if(DEBUG_ON) { Log.d(TAG, "onPause - NOT isFinishing()"); }
+            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - NOT isFinishing()"); }
                 ContentValues values = new ContentValues();
                     
                 // Bump the modification time to now.
@@ -332,7 +332,7 @@ public class TaskEditor extends Activity {
             }
         }
         else {
-        	if(DEBUG_ON) { Log.d(TAG, "onPause - mCursor IS NULL"); }
+        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - mCursor IS NULL"); }
         }
     }
 
@@ -388,7 +388,7 @@ public class TaskEditor extends Activity {
      * had created it, otherwise reverts to the original text.
      */
     private final void cancelTask() {
-    	if(DEBUG_ON) { Log.d(TAG, "cancelTask called"); }
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "cancelTask called"); }
         if (mCursor != null) {
             if (mState == STATE_EDIT) {
                 // Put the original note text back into the database

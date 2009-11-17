@@ -33,17 +33,10 @@
 package com.jasonantman.cyclesystem;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.text.format.Time;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 /**
@@ -51,15 +44,12 @@ import android.widget.TextView;
  *
  */
 public class Help extends Activity {
-	private static final String TAG = "Help";
 	
 	TextView t;
 	
     protected void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
-
-        final Intent intent = getIntent();
 
         // Set the layout for this activity.  You can find it in res/layout/note_editor.xml
         setContentView(R.layout.help);

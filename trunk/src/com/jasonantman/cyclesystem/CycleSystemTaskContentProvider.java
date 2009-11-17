@@ -49,7 +49,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.content.UriMatcher;
-import android.content.res.Resources;
 
 
 /**
@@ -241,7 +240,6 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
         }
         
         if (values.containsKey(Tasks.TITLE) == false) {
-            Resources r = Resources.getSystem();
             values.put(Tasks.TITLE, "");
         }
 

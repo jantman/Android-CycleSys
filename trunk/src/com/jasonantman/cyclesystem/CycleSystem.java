@@ -52,13 +52,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.GestureDetector.OnGestureListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.MotionEvent;
@@ -152,7 +150,7 @@ public class CycleSystem extends ListActivity {
         //   we should really have preferences for this stuff
         //   or even better pull from the database
         categorySpinner = new Spinner(this);
-        categorySpinnerAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
+        categorySpinnerAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categorySpinnerAdapter);
         categorySpinnerAdapter.add("--All--");
