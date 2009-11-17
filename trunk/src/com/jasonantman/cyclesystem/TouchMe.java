@@ -38,7 +38,7 @@ package com.jasonantman.cyclesystem;
  * @param ts Long timestamp
  * @return Integer[3] like [year, month, date]
  * @author jantman
- *
+ *   
  */
 public final class TouchMe {
 
@@ -50,8 +50,6 @@ public final class TouchMe {
 		foo = foo.replace('$', ' ');
 		foo = foo.substring(foo.indexOf(":")+1);
 		foo = foo.trim();
-//		foo = foo.substring(0, foo.indexOf(" "));
-//		foo = foo.trim();
 		return foo;
 	}
 	

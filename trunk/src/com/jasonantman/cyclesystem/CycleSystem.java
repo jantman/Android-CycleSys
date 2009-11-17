@@ -308,7 +308,8 @@ public class CycleSystem extends ListActivity {
             return;
         }
 
-        Cursor cursor = (Cursor) getListAdapter().getItem(info.position);
+        Cursor cursor = (Cursor) getListAdapter().getItem(info.position-2); // -2 fixes off-by-one error (issue: 
+        
         if (cursor == null) {
             // For some reason the requested item isn't available, do nothing
             return;
