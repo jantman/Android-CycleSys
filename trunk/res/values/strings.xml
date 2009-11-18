@@ -50,6 +50,7 @@
     <string name="menu_manage">Manage</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_finish">Finish</string>
+    <string name="menu_move">Move</string>
 
 	<string name="title_edit">Edit Task</string>
 	<string name="title_add">Add Task</string>

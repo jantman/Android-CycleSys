@@ -107,11 +107,14 @@ public class CycleSystem extends ListActivity {
     public static final int MENU_ITEM_SETTINGS = Menu.FIRST + 5;
     public static final int CONTEXT_ITEM_FINISH = Menu.FIRST + 6;
     public static final int CONTEXT_ITEM_EDIT = Menu.FIRST + 7;
+    public static final int CONTEXT_ITEM_MOVE = Menu.FIRST + 8;
     
     // currently displayed ts
     private Time t = new Time();
-    private long CURRENT_TS;
+    private int CURRENT_TS;
     private CharSequence timeTitleStr = "";
+    
+    private int CURRENT_CAT_ID;
     
     // for the header views
     private TextView headerDate;
@@ -124,7 +127,7 @@ public class CycleSystem extends ListActivity {
 
         // ts of day to display
         t.setToNow();
-        CURRENT_TS = t.toMillis(false);
+        CURRENT_TS = (int) t.toMillis(false) / 1000;
         
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
 
@@ -176,17 +179,10 @@ public class CycleSystem extends ListActivity {
         //categorySpinner.
         getListView().addHeaderView(categorySpinner);
         
-        // Perform a managed query. The Activity will handle closing and requerying the cursor
-        // when needed.
-        Cursor cursor = managedQuery(getIntent().getData(), PROJECTION, null, null, Tasks.DEFAULT_SORT_ORDER);
-
-        // Used to map task entries from the database to views
-        TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
-        		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
-        setListAdapter(adapter);
+        updateList();
         
         // Gesture detection
-        gestureDetector = new GestureDetector(new CycleSysGestureListener());
+        gestureDetector = new GestureDetector(new CycleSysGestureListener(this));
         gestureListener = new View.OnTouchListener() {
              public boolean onTouch(View v, MotionEvent event) {
                  if (gestureDetector.onTouchEvent(event)) {
@@ -330,6 +326,7 @@ public class CycleSystem extends ListActivity {
         // Add a menu item to delete the note
         menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
         menu.add(0, CONTEXT_ITEM_EDIT, 1, R.string.menu_edit);
+        menu.add(0, CONTEXT_ITEM_MOVE, 2, R.string.menu_move);
     }
         
     @Override
@@ -355,6 +352,10 @@ public class CycleSystem extends ListActivity {
             	showNotImplementedDialog();
             	return true;
             }
+            case CONTEXT_ITEM_MOVE: {
+            	showNotImplementedDialog();
+            	return true;
+            }
         }
         return false;
     }
@@ -375,36 +376,64 @@ public class CycleSystem extends ListActivity {
     }
     
     /**
-     * Update category filter
+     * Update the list to the selected category id.
      * @param id
      */
     protected void selectCategory(int id)
     {
-    	//
-    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, " selectCategory(" + Integer.toString(id) + ")"); }
-    	
-    	/*
-    	         Intent intent = getIntent();
-        if (intent.getData() == null) {
-            intent.setData(Tasks.CONTENT_URI);
-        }
-        */
-        
+    	if(DEBUG_ON) { Log.d(TAG, " selectCategory(" + Integer.toString(this.CURRENT_CAT_ID) + ")"); }
+    	this.CURRENT_CAT_ID = id;
+    	updateList();
+    }
+    
+    /**
+     * Update the list view
+     * @param id
+     */
+    protected void updateList()
+    {
     	Cursor cursor;
-    	if(id == 0)
+    	
+    	int start_ts = Util.getDayStart(this.CURRENT_TS);
+    	int end_ts = start_ts + 86399;
+    	
+    	String date_where = Tasks.DISPLAY_TS + ">=" + Integer.toString(start_ts) + " AND " + Tasks.DISPLAY_TS + "<=" + Integer.toString(end_ts);
+    	
+    	if(this.CURRENT_CAT_ID == 0)
     	{
-    		cursor = managedQuery(getIntent().getData(), PROJECTION, null, null, Tasks.DEFAULT_SORT_ORDER);
+    		cursor = managedQuery(getIntent().getData(), PROJECTION, date_where, null, Tasks.DEFAULT_SORT_ORDER);
     	}
     	else
     	{
-    		cursor = managedQuery(getIntent().getData(), PROJECTION, Tasks.CATEGORY_ID + "=" + Integer.toString(id), null, Tasks.DEFAULT_SORT_ORDER);
+    		cursor = managedQuery(getIntent().getData(), PROJECTION, Tasks.CATEGORY_ID + "=" + Integer.toString(this.CURRENT_CAT_ID) + " AND (" + date_where + ")", null, Tasks.DEFAULT_SORT_ORDER);
     	}
     	
         // Used to map task entries from the database to views
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
         		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
-    	
+    }
+    
+    /**
+     * Handle a left fling action.
+     */
+    void flingLeft()
+    {
+    	this.CURRENT_TS = this.CURRENT_TS - 86400;
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        headerDate.setText(timeTitleStr);
+        updateList();
+    }
+    
+    /**
+     * Handle a fling right action
+     */
+    public void flingRight()
+    {
+    	this.CURRENT_TS = this.CURRENT_TS + 86400;
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        headerDate.setText(timeTitleStr);
+        updateList();
     }
     
     /**

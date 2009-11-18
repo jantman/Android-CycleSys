@@ -43,6 +43,11 @@ import android.text.format.Time;
  */
 public final class Util {
 	
+	/**
+	 * turn a timestamp (millis) into an Integer[] array like (year, month, date)
+	 * @param ts
+	 * @return array
+	 */
 	public static Integer[] tsLongToYMD(Long ts)
 	{
 		Time t = new Time();
@@ -54,12 +59,34 @@ public final class Util {
 		return a;
 	}
 
+	/**
+	 * turn a set of Y M D ints into a timestamp (non-millis)
+	 * @param year
+	 * @param month
+	 * @param date
+	 * @return
+	 */
 	public static int YMDtoTSint(int year, int month, int date)
 	{
 		Time t = new Time();
 		t.set(date, month, year);
 		int foo = (int) (t.toMillis(false) / 1000);
 		return foo;
+	}
+	
+	/**
+	 * get the start timestamp of a day (non-millis) from a timestamp (non-millis)
+	 * @param ts
+	 * @return int timestamp
+	 */
+	public static int getDayStart(int ts)
+	{
+		Integer bar = ts;
+		Integer[] foo = tsLongToYMD(bar.longValue() * 1000);
+		Time baz = new Time();
+		baz.set(foo[0], foo[1], foo[2]);
+		int quux = (int) (baz.toMillis(false) / 1000);
+		return quux;
 	}
 	
 }
