@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com                  |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,32 +25,58 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $   |
- * | $HeadURL::                                                       $   |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
+
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.GestureDetector.SimpleOnGestureListener;
 
 /**
- * Just exists to get the SVN rev numbers into the program itself.
- * Should be "touched" before each SVN commit.
- * @param ts Long timestamp
- * @return Integer[3] like [year, month, date]
- * @author jantman                               
- *   
+ * @author jantman
+ *
  */
-public final class TouchMe {
+public class CycleSysGestureListener extends SimpleOnGestureListener {
 
-	public static final String SVNrev = "$LastChangedRevision$";
+	private static final String TAG = "CycleSysGestureListener"; // for debugging
 	
-	public static String getSvnRev()
-	{
-		String foo = SVNrev;
-		foo = foo.replace('$', ' ');
-		foo = foo.substring(foo.indexOf(":")+1);
-		foo = foo.trim();
-		return foo;
+	// swipe detection parameters
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    
+    private CycleSystem parent;
+	
+    public CycleSysGestureListener(CycleSystem parent)
+    {
+    	super();
+    	this.parent = parent;
+    }
+    
+	// @Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling()"); }
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return true;
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    // detected right to left swipe
+                	//if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: right to left swipe"); }
+                	parent.flingLeft();
+                }
+                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    // detected left to right swipe
+                	//if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: left to right swipe"); }
+                	parent.flingRight();
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return true;
 	}
 	
 }

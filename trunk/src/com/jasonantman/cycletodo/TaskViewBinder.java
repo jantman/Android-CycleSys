@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,12 +25,14 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
+
+import com.jasonantman.cycletodo.R;
 
 import android.database.Cursor;
 import android.graphics.Color;

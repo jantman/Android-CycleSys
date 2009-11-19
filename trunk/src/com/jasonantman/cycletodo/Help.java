@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,12 +25,14 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
+
+import com.jasonantman.cycletodo.R;
 
 import android.app.Activity;
 import android.content.pm.PackageInfo;
@@ -71,7 +73,7 @@ public class Help extends Activity {
         PackageManager pm = getPackageManager();
         try {
             //---get the package info---
-            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cyclesystem", 0);
+            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cycletodo", 0);
             //---display the versioncode---        
             return Integer.toString(pi.versionCode);
         } catch (NameNotFoundException e) {
@@ -86,7 +88,7 @@ public class Help extends Activity {
         PackageManager pm = getPackageManager();
         try {
             //---get the package info---
-            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cyclesystem", 0);
+            PackageInfo pi =  pm.getPackageInfo("com.jasonantman.cycletodo", 0);
             //---display the versioncode---        
             return pi.versionName;
         } catch (NameNotFoundException e) {

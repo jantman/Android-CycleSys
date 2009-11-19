@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com                  |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -32,9 +32,10 @@
  * @TODO - TODO - update the license for all of these files. is Apache 2.0 compatible with GPLv3? Can I do this?? 
  */
 
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
 
-import com.jasonantman.cyclesystem.TaskList.Tasks;
+import com.jasonantman.cycletodo.R;
+import com.jasonantman.cycletodo.TaskList.Tasks;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;

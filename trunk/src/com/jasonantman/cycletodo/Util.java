@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,29 +25,68 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.widget.SimpleCursorAdapter;
+import android.text.format.Time;
 
 /**
+ * General utility functions for CycleSystem
+ * @param ts Long timestamp
+ * @return Integer[3] like [year, month, date]
  * @author jantman
  *
  */
-public class TaskCursorAdapter extends SimpleCursorAdapter {
+public final class Util {
+	
+	/**
+	 * turn a timestamp (millis) into an Integer[] array like (year, month, date)
+	 * @param ts
+	 * @return array
+	 */
+	public static Integer[] tsLongToYMD(Long ts)
+	{
+		Time t = new Time();
+		t.set(ts);
+		Integer[] a = new Integer[3];
+		a[0] = t.year;
+		a[1] = t.month;
+		a[2] = t.monthDay;
+		return a;
+	}
 
-	    public TaskCursorAdapter(Context context, int layout, Cursor
-	c,String[] from, int[] to)
-	    {
-	        super(context, layout, c, from, to);
-	        
-	        setViewBinder((SimpleCursorAdapter.ViewBinder) new TaskViewBinder());
-	    }
+	/**
+	 * turn a set of Y M D ints into a timestamp (non-millis)
+	 * @param year
+	 * @param month
+	 * @param date
+	 * @return
+	 */
+	public static int YMDtoTSint(int year, int month, int date)
+	{
+		Time t = new Time();
+		t.set(date, month, year);
+		int foo = (int) (t.toMillis(false) / 1000);
+		return foo;
+	}
+	
+	/**
+	 * get the start timestamp of a day (non-millis) from a timestamp (non-millis)
+	 * @param ts
+	 * @return int timestamp
+	 */
+	public static int getDayStart(int ts)
+	{
+		Integer bar = ts;
+		Integer[] foo = tsLongToYMD(bar.longValue() * 1000);
+		Time baz = new Time();
+		baz.set(foo[0], foo[1], foo[2]);
+		int quux = (int) (baz.toMillis(false) / 1000);
+		return quux;
+	}
 	
 }

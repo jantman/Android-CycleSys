@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -25,16 +25,16 @@
  * +----------------------------------------------------------------------+
  * | Authors: Jason Antman <jason@jasonantman.com>                        |
  * +----------------------------------------------------------------------+
- * | $LastChangedRevision::                                           $ |
- * | $HeadURL::                                                       $ |
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
  */
-package com.jasonantman.cyclesystem;
+package com.jasonantman.cycletodo;
 
 import java.util.HashMap;
 
-import com.jasonantman.cyclesystem.TaskList.Tasks;
+import com.jasonantman.cycletodo.TaskList.Tasks;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -59,8 +59,8 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 
 	private static final String TAG = "CycleSystemTaskContentProvider"; // for debugging/Log
 	
-	public static final Uri CONTENT_URI = Uri.parse("content://com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider");
-	public static final String AUTHORITY = "com.jasonantman.cyclesystem.cyclesystemtaskcontentprovider";
+	public static final Uri CONTENT_URI = Uri.parse("content://com.jasonantman.cycletodo.cyclesystemtaskcontentprovider");
+	public static final String AUTHORITY = "com.jasonantman.cycletodo.cyclesystemtaskcontentprovider";
 	
     private static final String DATABASE_NAME = "cyclesystem.db";
     private static final int DATABASE_VERSION = 1;
