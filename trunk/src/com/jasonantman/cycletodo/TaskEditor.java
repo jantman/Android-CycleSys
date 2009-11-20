@@ -115,7 +115,7 @@ public class TaskEditor extends Activity {
     private DatePicker datePick;
     
     // move buttons
-    private Button button_moveOne;
+    private Button button_moveToday;
     private Button button_moveWork;
     
     /**
@@ -213,10 +213,11 @@ public class TaskEditor extends Activity {
         datePick.updateDate(t.year, t.month, t.monthDay);
         
         // move to next day button
-        button_moveOne = (Button) findViewById(R.id.moveOne);
-        button_moveOne.setOnClickListener(new View.OnClickListener() {
+        button_moveToday = (Button) findViewById(R.id.moveOne);
+        button_moveToday.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	showNotImplementedDialog();
+            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "button_moveToday onClick()"); }
+            	moveToday();
             }
         });
 
@@ -224,7 +225,8 @@ public class TaskEditor extends Activity {
         button_moveWork = (Button) findViewById(R.id.moveNextWork);
         button_moveWork.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	showNotImplementedDialog();
+            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "button_moveWork onClick()"); }
+            	moveNextWorkDay();
             }
         });
         
@@ -456,4 +458,43 @@ public class TaskEditor extends Activity {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
+    
+    /**
+     * Move this task to today.
+     */
+    protected void moveToday()
+    {
+    	Time t = new Time();
+    	t.setToNow();
+        int foo = (int) (t.toMillis(false) / 1000);
+        foo = Util.getDayStart(foo);
+        updateDatePicker(foo);
+    }
+    
+    /**
+     * Move task to next work day.
+     */
+    protected void moveNextWorkDay()
+    {
+    	Time t = new Time();
+    	Integer display_ts = Util.YMDtoTSint(datePick.getYear(), datePick.getMonth(), datePick.getDayOfMonth());
+    	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "moveNextWorkDay() display_ts=" + display_ts.toString()); }
+    	t.set(display_ts.longValue() * 1000);
+        int foo = (int) (t.toMillis(false) / 1000);
+    	int bar = Util.findNextWorkDay(foo);
+    	updateDatePicker(bar);
+    }
+    
+    /**
+     * Update the date picker to reflect a TS
+     * @param ts
+     */
+    private void updateDatePicker(int ts)
+    {
+    	Integer foo = ts;
+    	Long myDateTS = foo.longValue() * 1000; // need to cast to millis
+        Integer[] myDate = Util.tsLongToYMD(myDateTS);
+        datePick.updateDate(myDate[0], myDate[1], myDate[2]);
+    }
+    
 }

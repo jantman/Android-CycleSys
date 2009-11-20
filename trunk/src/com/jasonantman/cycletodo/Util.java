@@ -32,7 +32,9 @@
  */
 package com.jasonantman.cycletodo;
 
+import android.text.format.DateFormat;
 import android.text.format.Time;
+import android.util.Log;
 
 /**
  * General utility functions for CycleSystem
@@ -42,6 +44,8 @@ import android.text.format.Time;
  *
  */
 public final class Util {
+	
+	public static final String TAG = "Util";
 	
 	/**
 	 * turn a timestamp (millis) into an Integer[] array like (year, month, date)
@@ -82,11 +86,55 @@ public final class Util {
 	public static int getDayStart(int ts)
 	{
 		Integer bar = ts;
+		
 		Integer[] foo = tsLongToYMD(bar.longValue() * 1000);
+		
 		Time baz = new Time();
-		baz.set(foo[0], foo[1], foo[2]);
+		baz.set(foo[2], foo[1], foo[0]);
 		int quux = (int) (baz.toMillis(false) / 1000);
+		
 		return quux;
+	}
+	
+	/**
+	 * Return the timestamp (int) for the start of the next work day
+	 * @param ts
+	 * @return
+	 */
+	public static int findNextWorkDay(int ts)
+	{
+		Integer bar = ts;
+		Time t = new Time();
+		t.set(bar.longValue() * 1000);
+		
+		int dayOfWeek = t.weekDay; // 0-6, 0 is sunday
+		if(CycleSystem.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
+		
+		// we have a ts and the day of the week. find the next work day.
+		if(dayOfWeek < CycleSystem.firstWorkDay)
+		{
+			// before the start of the work week. move to next firstWorkDay
+			return (ts + ( (CycleSystem.firstWorkDay - dayOfWeek) * 86400));
+		}
+		else if(dayOfWeek >= CycleSystem.lastWorkDay)
+		{
+			// after the end of the work week. move to next firstWorkDay
+			int foo = 6 - dayOfWeek;
+			foo = foo + CycleSystem.firstWorkDay + 1;
+			return (ts + ( foo * 86400) );
+		}
+		else if(dayOfWeek >= CycleSystem.firstWorkDay && dayOfWeek < CycleSystem.lastWorkDay)
+		{
+			// next day is a work day, just move to next day
+			return (ts + 86400);
+		}
+		else
+		{
+			if(CycleSystem.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() UNHANDLED CASE ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
+		}
+		
+		
+		return ts; // DEBUG
 	}
 	
 }

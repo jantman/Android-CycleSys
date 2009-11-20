@@ -38,6 +38,8 @@ import com.jasonantman.cycletodo.R;
 import com.jasonantman.cycletodo.TaskList.Tasks;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -56,6 +58,7 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -93,8 +96,10 @@ public class CycleSystem extends ListActivity {
     // controls debugging-level output
     public static final boolean DEBUG_ON = true;
     
-    // @TODO - TODO - this should be a preference
-    private static final CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
+    // @TODO - TODO - these should be preferences
+    private CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
+    protected static int firstWorkDay = 1; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
+    protected static int lastWorkDay = 5; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     
     /**
      * TODO: no idea why these are here
@@ -109,6 +114,21 @@ public class CycleSystem extends ListActivity {
     public static final int CONTEXT_ITEM_FINISH = Menu.FIRST + 6;
     public static final int CONTEXT_ITEM_EDIT = Menu.FIRST + 7;
     public static final int CONTEXT_ITEM_MOVE = Menu.FIRST + 8;
+    
+    // dialog IDs
+    static final int DATE_DIALOG_ID = 999;
+    // the callback received when the user "sets" the date in the dialog
+    private DatePickerDialog.OnDateSetListener mDateSetListener =
+            new DatePickerDialog.OnDateSetListener() {
+
+                public void onDateSet(DatePicker view, int year, int month, int date)
+                {
+                	if(DEBUG_ON) { Log.d(TAG, " onDateSelectedListener() old CURRENT_TS=" + Integer.toString(CURRENT_TS)); }
+                	CURRENT_TS = Util.YMDtoTSint(year, month, date);
+                	if(DEBUG_ON) { Log.d(TAG, " onDateSelectedListener() new CURRENT_TS=" + Integer.toString(CURRENT_TS)); }
+                    updateList();
+                }
+            };
     
     // currently displayed ts
     private Time t = new Time();
@@ -294,7 +314,7 @@ public class CycleSystem extends ListActivity {
         	startActivity(i);
         	return true;
         case MENU_ITEM_GOTO:
-        	showNotImplementedDialog();
+        	showDialog(DATE_DIALOG_ID);
         	return true;
         case MENU_ITEM_MANAGE:
         	showNotImplementedDialog();
@@ -304,6 +324,16 @@ public class CycleSystem extends ListActivity {
         	return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DATE_DIALOG_ID:
+        	Integer[] foo = Util.tsLongToYMD(((long) this.CURRENT_TS * 1000));
+            return new DatePickerDialog(this, mDateSetListener, foo[0], foo[1], foo[2]);
+        }
+        return null;
     }
 
     //@Override
@@ -396,10 +426,13 @@ public class CycleSystem extends ListActivity {
     {
     	Cursor cursor;
     	
+    	if(DEBUG_ON) { Log.d(TAG, " updateList() CURRENT_TS=" + Integer.toString(this.CURRENT_TS)); }
+    	
     	int start_ts = Util.getDayStart(this.CURRENT_TS);
     	int end_ts = start_ts + 86399;
     	
     	String date_where = Tasks.DISPLAY_TS + ">=" + Integer.toString(start_ts) + " AND " + Tasks.DISPLAY_TS + "<=" + Integer.toString(end_ts);
+    	if(DEBUG_ON) { Log.d(TAG, " updateList() date_where=" + date_where); }
     	
     	if(this.CURRENT_CAT_ID == 0)
     	{
@@ -414,6 +447,8 @@ public class CycleSystem extends ListActivity {
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
         		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
+        headerDate.setText(timeTitleStr);
     }
     
     /**
@@ -421,9 +456,7 @@ public class CycleSystem extends ListActivity {
      */
     void flingLeft()
     {
-    	this.CURRENT_TS = this.CURRENT_TS - 86400;
-        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
-        headerDate.setText(timeTitleStr);
+    	this.CURRENT_TS = this.CURRENT_TS + 86400;
         updateList();
     }
     
@@ -432,9 +465,7 @@ public class CycleSystem extends ListActivity {
      */
     public void flingRight()
     {
-    	this.CURRENT_TS = this.CURRENT_TS + 86400;
-        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
-        headerDate.setText(timeTitleStr);
+    	this.CURRENT_TS = this.CURRENT_TS - 86400;
         updateList();
     }
     

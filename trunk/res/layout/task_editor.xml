@@ -117,7 +117,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		android:layout_height="wrap_content" 
 		android:layout_below="@+id/date" 
 		android:layout_width="wrap_content" 
-		android:text="Move to Next Day" 
+		android:text="Move to Today" 
 		android:layout_centerHorizontal="true" ></Button>
 		
 	<Button android:id="@+id/moveNextWork"
