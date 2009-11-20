@@ -42,6 +42,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -94,7 +95,7 @@ public class CycleSystem extends ListActivity {
     };
 	
     // controls debugging-level output
-    public static final boolean DEBUG_ON = true;
+    public static final boolean DEBUG_ON = false;
     
     // @TODO - TODO - these should be preferences
     private CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
@@ -123,10 +124,25 @@ public class CycleSystem extends ListActivity {
 
                 public void onDateSet(DatePicker view, int year, int month, int date)
                 {
-                	if(DEBUG_ON) { Log.d(TAG, " onDateSelectedListener() old CURRENT_TS=" + Integer.toString(CURRENT_TS)); }
                 	CURRENT_TS = Util.YMDtoTSint(year, month, date);
-                	if(DEBUG_ON) { Log.d(TAG, " onDateSelectedListener() new CURRENT_TS=" + Integer.toString(CURRENT_TS)); }
                     updateList();
+                }
+            };
+            
+    static final int MOVE_DATE_DIALOG_ID = 990;
+    // the callback received when the user "sets" the date in the dialog
+    private Uri FOO_MOVE_URI;
+    private ContentResolver FOO_MOVE_RESOLVER;
+    private DatePickerDialog.OnDateSetListener mMoveDateSetListener =
+            new DatePickerDialog.OnDateSetListener() {
+
+            	public void onDateSet(DatePicker view, int year, int month, int date)
+                {
+            		int foobar = Util.YMDtoTSint(year, month, date);
+            		ContentValues values = new ContentValues();
+            		values.put(Tasks.DISPLAY_TS, foobar);
+            		FOO_MOVE_RESOLVER.update(FOO_MOVE_URI, values, null, null);
+            		updateList();
                 }
             };
     
@@ -149,7 +165,6 @@ public class CycleSystem extends ListActivity {
         // ts of day to display
         this.t.setToNow();
         this.CURRENT_TS = (int) (this.t.toMillis(false) / 1000);
-        if(DEBUG_ON) { Log.d(TAG, " onCreate() CURRENT_TS=" + Integer.toString(this.CURRENT_TS)); }
         
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
 
@@ -332,6 +347,9 @@ public class CycleSystem extends ListActivity {
         case DATE_DIALOG_ID:
         	Integer[] foo = Util.tsLongToYMD(((long) this.CURRENT_TS * 1000));
             return new DatePickerDialog(this, mDateSetListener, foo[0], foo[1], foo[2]);
+        case MOVE_DATE_DIALOG_ID:
+        	Integer[] bar = Util.tsLongToYMD(((long) this.CURRENT_TS * 1000));
+            return new DatePickerDialog(this, mMoveDateSetListener, bar[0], bar[1], bar[2]);
         }
         return null;
     }
@@ -372,21 +390,22 @@ public class CycleSystem extends ListActivity {
             return false;
         }
 
+        Uri taskUri = ContentUris.withAppendedId(getIntent().getData(), info.id);
+        
         switch (item.getItemId()) {
             case CONTEXT_ITEM_FINISH: {
                 // Update the task that the context menu is for
-                Uri noteUri = ContentUris.withAppendedId(getIntent().getData(), info.id);
                 ContentValues values = new ContentValues();
                 values.put(Tasks.IS_FINISHED, 1);
-                getContentResolver().update(noteUri, values, null, null);
+                getContentResolver().update(taskUri, values, null, null);
                 return true;
             }
             case CONTEXT_ITEM_EDIT: {
-            	showNotImplementedDialog();
+            	startActivity(new Intent(Intent.ACTION_EDIT, taskUri));
             	return true;
             }
             case CONTEXT_ITEM_MOVE: {
-            	showNotImplementedDialog();
+            	showMoveItemDialog(taskUri);
             	return true;
             }
         }
@@ -426,13 +445,10 @@ public class CycleSystem extends ListActivity {
     {
     	Cursor cursor;
     	
-    	if(DEBUG_ON) { Log.d(TAG, " updateList() CURRENT_TS=" + Integer.toString(this.CURRENT_TS)); }
-    	
     	int start_ts = Util.getDayStart(this.CURRENT_TS);
     	int end_ts = start_ts + 86399;
     	
     	String date_where = Tasks.DISPLAY_TS + ">=" + Integer.toString(start_ts) + " AND " + Tasks.DISPLAY_TS + "<=" + Integer.toString(end_ts);
-    	if(DEBUG_ON) { Log.d(TAG, " updateList() date_where=" + date_where); }
     	
     	if(this.CURRENT_CAT_ID == 0)
     	{
@@ -467,6 +483,17 @@ public class CycleSystem extends ListActivity {
     {
     	this.CURRENT_TS = this.CURRENT_TS - 86400;
         updateList();
+    }
+    
+    /**
+     * Show dialog to move an item from the context menu.
+     * @param uri
+     */
+    protected void showMoveItemDialog(Uri uri)
+    {
+    	this.FOO_MOVE_URI = uri;
+        this.FOO_MOVE_RESOLVER = getContentResolver();
+    	showDialog(MOVE_DATE_DIALOG_ID);
     }
     
     /**

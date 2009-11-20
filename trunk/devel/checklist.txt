@@ -1,6 +1,6 @@
 /**
  * +----------------------------------------------------------------------+
- * | CycleSystem      http://CycleSystem.jasonantman.com          |
+ * | CycleToDo                  http://CycleToDo.jasonantman.com          |
  * +----------------------------------------------------------------------+
  * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
  * |                                                                      |
@@ -32,7 +32,7 @@
  */
 
 COMMIT CHECKLIST:
-1. Change src/com.jasonantman.cyclesystem/TouchMe.java to update SVN keywords for revision.
+1. Change src/com.jasonantman.cycletodo/TouchMe.java to update SVN keywords for revision.
 2. Commit, be sure to reference Eventum issue numbers.
 3. Create Time Tracking entries in Eventum.
 

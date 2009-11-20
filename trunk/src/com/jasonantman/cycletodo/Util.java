@@ -32,12 +32,11 @@
  */
 package com.jasonantman.cycletodo;
 
-import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.util.Log;
 
 /**
- * General utility functions for CycleSystem
+ * General utility functions for CycleToDo
  * @param ts Long timestamp
  * @return Integer[3] like [year, month, date]
  * @author jantman
@@ -108,7 +107,6 @@ public final class Util {
 		t.set(bar.longValue() * 1000);
 		
 		int dayOfWeek = t.weekDay; // 0-6, 0 is sunday
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
 		
 		// we have a ts and the day of the week. find the next work day.
 		if(dayOfWeek < CycleSystem.firstWorkDay)
@@ -133,8 +131,7 @@ public final class Util {
 			if(CycleSystem.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() UNHANDLED CASE ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
 		}
 		
-		
-		return ts; // DEBUG
+		return ts;
 	}
 	
 }

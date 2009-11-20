@@ -61,7 +61,7 @@ public class Help extends Activity {
         t = (TextView) findViewById(R.id.TextView02);
         CharSequence text = "Copyright 2009 Jason Antman. Licensed under GNU GPLv3.\n\n";
         text = text + "Thanks to Tom Limoncelli for writing the book that sparked all of this - Time Management for System Administrators.\n\n";
-        text = text + "For help, to report bugs, or to get the source: http://cyclesys.jasonantman.com\n\n";
+        text = text + "For help, to report bugs, or to get the source: http://cycletodo.jasonantman.com\n\n";
         text = text + "SVN revision: " + TouchMe.getSvnRev() + "\n";
         text = text + "Version Code: " + getVersionCode() + "\n";
         text = text + "Version Name: " + getVersionName() + "\n";

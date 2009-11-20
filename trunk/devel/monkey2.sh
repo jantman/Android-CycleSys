@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # +----------------------------------------------------------------------+
-# | CycleSystem                http://CycleSystem.jasonantman.com        |
+# | CycleToDo                    http://CycleToDo.jasonantman.com        |
 # +----------------------------------------------------------------------+
 # | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
 # |                                                                      |
