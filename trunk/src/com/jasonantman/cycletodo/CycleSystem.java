@@ -127,8 +127,9 @@ public class CycleSystem extends ListActivity {
         super.onCreate(savedInstanceState);
 
         // ts of day to display
-        t.setToNow();
-        CURRENT_TS = (int) t.toMillis(false) / 1000;
+        this.t.setToNow();
+        this.CURRENT_TS = (int) (this.t.toMillis(false) / 1000);
+        if(DEBUG_ON) { Log.d(TAG, " onCreate() CURRENT_TS=" + Integer.toString(this.CURRENT_TS)); }
         
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
 
@@ -145,7 +146,8 @@ public class CycleSystem extends ListActivity {
         // create the header views
         headerDate = new TextView(this);
         headerDate.setMaxLines(1);
-        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
         headerDate.setText(timeTitleStr);
         headerDate.setGravity(Gravity.CENTER_HORIZONTAL);
         getListView().addHeaderView(headerDate);
@@ -382,7 +384,6 @@ public class CycleSystem extends ListActivity {
      */
     protected void selectCategory(int id)
     {
-    	if(DEBUG_ON) { Log.d(TAG, " selectCategory(" + Integer.toString(this.CURRENT_CAT_ID) + ")"); }
     	this.CURRENT_CAT_ID = id;
     	updateList();
     }
@@ -421,7 +422,7 @@ public class CycleSystem extends ListActivity {
     void flingLeft()
     {
     	this.CURRENT_TS = this.CURRENT_TS - 86400;
-        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
         headerDate.setText(timeTitleStr);
         updateList();
     }
@@ -432,7 +433,7 @@ public class CycleSystem extends ListActivity {
     public void flingRight()
     {
     	this.CURRENT_TS = this.CURRENT_TS + 86400;
-        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, CURRENT_TS);
+        timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
         headerDate.setText(timeTitleStr);
         updateList();
     }
