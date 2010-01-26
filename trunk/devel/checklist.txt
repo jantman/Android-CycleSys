@@ -44,5 +44,10 @@ BUILD CHECKLIST:
 4. Remove the android:debuggable="true" attribute from the <application> element of the manifest.
 5. Update application versionCode and versionName in manifest.
 6. Compile
-7. APL Export Wizard - sign, zipalign
+7. APL Export Wizard - export signed package as CycleToDo-unaligned.apk
+8. zipalign -v 4 CycleToDo-unaligned.apk CycleToDo.apk
+9. Copy the two apk's into packages/
+10. Commit this as the canonical revision for this release.
+11. Tag the trunk.
+
 
