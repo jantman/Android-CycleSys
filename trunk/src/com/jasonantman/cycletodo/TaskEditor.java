@@ -280,7 +280,7 @@ public class TaskEditor extends Activity {
             }
 
         } else {
-        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onResume, mCursor IS NULL"); }
+        	if(CycleToDo.DEBUG_ON) { Log.d(TAG, "onResume, mCursor IS NULL"); }
             setTitle(getText(R.string.error_title));
             titleEdit.setText(getText(R.string.error_message));
         }
@@ -319,13 +319,13 @@ public class TaskEditor extends Activity {
             // Note that we do this both for editing and inserting...  it
             // would be reasonable to only do it when inserting.
             if (isFinishing() && title.trim().equalsIgnoreCase("")) {
-            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - isFinishing()"); }
+            	if(CycleToDo.DEBUG_ON) { Log.d(TAG, "onPause - isFinishing()"); }
                 setResult(RESULT_CANCELED);
                 deleteTask();
 
             // Get out updates into the provider.
             } else {
-            	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - NOT isFinishing()"); }
+            	if(CycleToDo.DEBUG_ON) { Log.d(TAG, "onPause - NOT isFinishing()"); }
                 ContentValues values = new ContentValues();
                     
                 // Bump the modification time to now.
@@ -344,7 +344,7 @@ public class TaskEditor extends Activity {
             }
         }
         else {
-        	if(CycleSystem.DEBUG_ON) { Log.d(TAG, "onPause - mCursor IS NULL"); }
+        	if(CycleToDo.DEBUG_ON) { Log.d(TAG, "onPause - mCursor IS NULL"); }
         }
     }
 

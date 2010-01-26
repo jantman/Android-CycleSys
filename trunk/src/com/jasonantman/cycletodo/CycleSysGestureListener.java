@@ -49,9 +49,9 @@ public class CycleSysGestureListener extends SimpleOnGestureListener {
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
     
-    private CycleSystem parent;
+    private CycleToDo parent;
 	
-    public CycleSysGestureListener(CycleSystem parent)
+    public CycleSysGestureListener(CycleToDo parent)
     {
     	super();
     	this.parent = parent;
@@ -59,18 +59,18 @@ public class CycleSysGestureListener extends SimpleOnGestureListener {
     
 	// @Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-		if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling()"); }
+		if(CycleToDo.DEBUG_ON) { Log.d(TAG, " onFling()"); }
             try {
                 if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
                     return true;
                 if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     // detected right to left swipe
-                	//if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: right to left swipe"); }
+                	//if(CycleToDo.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: right to left swipe"); }
                 	parent.flingLeft();
                 }
                 else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     // detected left to right swipe
-                	//if(CycleSystem.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: left to right swipe"); }
+                	//if(CycleToDo.DEBUG_ON) { Log.d(TAG, " onFling: got gesture: left to right swipe"); }
                 	parent.flingRight();
                 }
             } catch (Exception e) {

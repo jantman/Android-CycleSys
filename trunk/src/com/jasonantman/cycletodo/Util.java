@@ -109,26 +109,26 @@ public final class Util {
 		int dayOfWeek = t.weekDay; // 0-6, 0 is sunday
 		
 		// we have a ts and the day of the week. find the next work day.
-		if(dayOfWeek < CycleSystem.firstWorkDay)
+		if(dayOfWeek < CycleToDo.firstWorkDay)
 		{
 			// before the start of the work week. move to next firstWorkDay
-			return (ts + ( (CycleSystem.firstWorkDay - dayOfWeek) * 86400));
+			return (ts + ( (CycleToDo.firstWorkDay - dayOfWeek) * 86400));
 		}
-		else if(dayOfWeek >= CycleSystem.lastWorkDay)
+		else if(dayOfWeek >= CycleToDo.lastWorkDay)
 		{
 			// after the end of the work week. move to next firstWorkDay
 			int foo = 6 - dayOfWeek;
-			foo = foo + CycleSystem.firstWorkDay + 1;
+			foo = foo + CycleToDo.firstWorkDay + 1;
 			return (ts + ( foo * 86400) );
 		}
-		else if(dayOfWeek >= CycleSystem.firstWorkDay && dayOfWeek < CycleSystem.lastWorkDay)
+		else if(dayOfWeek >= CycleToDo.firstWorkDay && dayOfWeek < CycleToDo.lastWorkDay)
 		{
 			// next day is a work day, just move to next day
 			return (ts + 86400);
 		}
 		else
 		{
-			if(CycleSystem.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() UNHANDLED CASE ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
+			if(CycleToDo.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() UNHANDLED CASE ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
 		}
 		
 		return ts;

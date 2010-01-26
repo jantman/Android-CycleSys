@@ -73,10 +73,10 @@ import android.view.MotionEvent;
  * provided in the intent if there is one, otherwise defaults to displaying the
  * contents of the {@link NotePadProvider}
  */
-public class CycleSystem extends ListActivity {
+public class CycleToDo extends ListActivity {
     /** Called when the activity is first created. */
     
-	private static final String TAG = "CycleSystem";
+	private static final String TAG = "CycleToDo";
 	
 	// stuff for gestures
     private GestureDetector gestureDetector;
@@ -271,7 +271,7 @@ public class CycleSystem extends ListActivity {
         Intent intent = new Intent(null, getIntent().getData());
         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
         menu.addIntentOptions(Menu.CATEGORY_ALTERNATIVE, 0, 0,
-                new ComponentName(this, CycleSystem.class), null, intent, 0, null);
+                new ComponentName(this, CycleToDo.class), null, intent, 0, null);
 
         return true;
     }
