@@ -53,7 +53,7 @@ public class Help extends Activity {
     	
         super.onCreate(savedInstanceState);
 
-        // Set the layout for this activity.  You can find it in res/layout/note_editor.xml
+        // Set the layout for this activity.
         setContentView(R.layout.help);
         
         // text edit view for title

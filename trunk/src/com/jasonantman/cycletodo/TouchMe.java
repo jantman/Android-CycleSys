@@ -37,7 +37,7 @@ package com.jasonantman.cycletodo;
  * Should be "touched" before each SVN commit.
  * @param ts Long timestamp
  * @return Integer[3] like [year, month, date]
- * @author jantman  
+ * @author jantman   
  *   
  */
 public final class TouchMe {
