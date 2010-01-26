@@ -109,7 +109,7 @@ public class CycleToDo extends ListActivity {
     public static final int MENU_ITEM_INSERT = Menu.FIRST;
     public static final int MENU_ITEM_GOTO = Menu.FIRST + 1;
     public static final int MENU_ITEM_MANAGE = Menu.FIRST + 2;
-    public static final int MENU_ITEM_PURGE = Menu.FIRST + 3;
+    public static final int MENU_ITEM_TODAY = Menu.FIRST + 3;
     public static final int MENU_ITEM_HELP = Menu.FIRST + 4;
     public static final int MENU_ITEM_SETTINGS = Menu.FIRST + 5;
     public static final int CONTEXT_ITEM_FINISH = Menu.FIRST + 6;
@@ -253,9 +253,9 @@ public class CycleToDo extends ListActivity {
         	.setShortcut('6', 'm')
         	.setIcon(android.R.drawable.ic_menu_agenda);  
         
-        menu.add(0, MENU_ITEM_PURGE, 0, R.string.menu_purge)
-        	.setShortcut('7', 'p')
-        	.setIcon(android.R.drawable.ic_menu_delete);  
+        menu.add(0, MENU_ITEM_TODAY, 0, R.string.menu_today)
+        	.setShortcut('8', 't')
+        	.setIcon(android.R.drawable.ic_menu_today);  
         
         menu.add(0, MENU_ITEM_HELP, 0, R.string.menu_help)
         	.setShortcut('0', 'h')
@@ -319,9 +319,11 @@ public class CycleToDo extends ListActivity {
             // Launch activity to insert a new item
             startActivity(new Intent(Intent.ACTION_INSERT, getIntent().getData()));
             return true;
-        case MENU_ITEM_PURGE:
+        case MENU_ITEM_TODAY:
         	// Purge the finished items
-            getContentResolver().delete(getIntent().getData(), Tasks.IS_FINISHED + "==1", null);
+        	t.setToNow();
+            CURRENT_TS = (int) (this.t.toMillis(false) / 1000);
+            updateList();
         	return true;
         case MENU_ITEM_HELP:
         	//startActivity(new Intent(Intent.ACTION_SYSTEM_TUTORIAL)); // total hack

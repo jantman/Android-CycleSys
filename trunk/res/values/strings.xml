@@ -46,7 +46,7 @@
 	<string name="menu_revert">Revert</string>
     <string name="menu_discard">Discard</string>
     <string name="menu_goto">GoTo</string>
-    <string name="menu_purge">Purge</string>
+    <string name="menu_today">Today</string>
     <string name="menu_manage">Manage</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_finish">Finish</string>
