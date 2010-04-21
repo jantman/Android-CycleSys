@@ -31,7 +31,7 @@
  * @author Jason Antman <jason@jasonantman.com>
  */
 package com.jasonantman.cycletodo;
-
+ 
 /**
  * Just exists to get the SVN rev numbers into the program itself.
  * Should be "touched" before each SVN commit.
