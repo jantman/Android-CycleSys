@@ -36,7 +36,6 @@ package com.jasonantman.cycletodo;
 
 import com.jasonantman.cycletodo.R;
 import com.jasonantman.cycletodo.TaskList.Tasks;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -55,6 +54,7 @@ import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
@@ -66,6 +66,7 @@ import android.widget.TextView;
 import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.MotionEvent;
+import android.content.SharedPreferences;
 
 
 /**
@@ -95,12 +96,15 @@ public class CycleToDo extends ListActivity {
     };
 	
     // controls debugging-level output
-    public static final boolean DEBUG_ON = false;
+    public static final boolean DEBUG_ON = true;
     
     // @TODO - TODO - these should be preferences
     private CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
     protected static int firstWorkDay = 1; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     protected static int lastWorkDay = 5; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
+    
+    // Preferences stuff
+    public static final String PREFS_NAME = "CycleToDoPrefs";
     
     /**
      * TODO: no idea why these are here
@@ -115,6 +119,9 @@ public class CycleToDo extends ListActivity {
     public static final int CONTEXT_ITEM_FINISH = Menu.FIRST + 6;
     public static final int CONTEXT_ITEM_EDIT = Menu.FIRST + 7;
     public static final int CONTEXT_ITEM_MOVE = Menu.FIRST + 8;
+    public static final int SETTINGS_MENU_ITEM_BACKUP = Menu.FIRST + 9;
+    public static final int SETTINGS_MENU_ITEM_CATEGORY = Menu.FIRST + 10;
+    public static final int SETTINGS_MENU_ITEM_WORK_DAYS = Menu.FIRST + 11;
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
@@ -233,8 +240,28 @@ public class CycleToDo extends ListActivity {
          this.getListView().setOnTouchListener(gestureListener);
          // end Gesture detection
         
+         // Restore preferences
+         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+         // EXAMPLE:
+         //boolean silent = settings.getBoolean("silentMode", false);
+         //setSilent(silent);
     }
 
+    // this is really just for the prefs.
+    @Override
+    protected void onStop(){
+       super.onStop();
+    
+      // Save user preferences. We need an Editor object to
+      // make changes. All objects are from android.context.Context
+      SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+      SharedPreferences.Editor editor = settings.edit();
+      editor.putBoolean("silentMode", false);
+
+      // Don't forget to commit your edits!!!
+      editor.commit();
+    }
+    
     //@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -260,9 +287,13 @@ public class CycleToDo extends ListActivity {
         menu.add(0, MENU_ITEM_HELP, 0, R.string.menu_help)
         	.setShortcut('0', 'h')
         	.setIcon(android.R.drawable.ic_menu_help);
-
-        menu.add(0, MENU_ITEM_SETTINGS, 0, R.string.menu_settings)
+        
+        SubMenu SettingsMenu = menu.addSubMenu(0, MENU_ITEM_SETTINGS, 0, R.string.menu_settings)
         	.setIcon(android.R.drawable.ic_menu_preferences);
+        
+        SettingsMenu.add(0, SETTINGS_MENU_ITEM_BACKUP, 0, R.string.settings_menu_backup);
+        SettingsMenu.add(0, SETTINGS_MENU_ITEM_CATEGORY, 0, R.string.settings_menu_default_category);
+        SettingsMenu.add(0, SETTINGS_MENU_ITEM_WORK_DAYS, 0, R.string.settings_menu_work_days);
         
         // Generate any additional actions that can be performed on the
         // overall list.  In a normal install, there are no additional
@@ -334,10 +365,16 @@ public class CycleToDo extends ListActivity {
         	showDialog(DATE_DIALOG_ID);
         	return true;
         case MENU_ITEM_MANAGE:
-        	showNotImplementedDialog();
+        	showNotImplementedDialog("manage");
         	return true;
-        case MENU_ITEM_SETTINGS:
-        	showNotImplementedDialog();
+        case SETTINGS_MENU_ITEM_BACKUP:
+        	doBackupToSD();
+        	return true;
+        case SETTINGS_MENU_ITEM_CATEGORY:
+        	showNotImplementedDialog("category");
+        	return true;
+        case SETTINGS_MENU_ITEM_WORK_DAYS:
+        	showNotImplementedDialog("work days");
         	return true;
         }
         return super.onOptionsItemSelected(item);
@@ -472,7 +509,7 @@ public class CycleToDo extends ListActivity {
     /**
      * Handle a left fling action.
      */
-    void flingLeft()
+    public void flingLeft()
     {
     	this.CURRENT_TS = this.CURRENT_TS + 86400;
         updateList();
@@ -503,14 +540,34 @@ public class CycleToDo extends ListActivity {
      * @todo - TODO - remove this in production code
      * got this from http://moazzam-khan.com/blog/?p=134
      */
-    protected void showNotImplementedDialog()
+    protected void showNotImplementedDialog(String s)
     {
         AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-        dlgAlert.setMessage(R.string.alert_notimplemented);
+        dlgAlert.setMessage("NOTICE - this function (" + s + ") has not been implemented.");
         dlgAlert.setTitle(R.string.alert_notimplemented_title);
         dlgAlert.setPositiveButton("OK", null);
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
 
+    /**
+     * Backup the SQLite DB to the SD card
+     */
+    protected boolean doBackupToSD()
+    {
+    	if(! Util.haveExternStorage())
+    	{
+    		AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+    		dlgAlert.setMessage("ERROR - External storage not available.");
+    		dlgAlert.setTitle(R.string.alert_storError_title);
+    		dlgAlert.setPositiveButton("OK", null);
+    		dlgAlert.setCancelable(true);
+    		dlgAlert.create().show();
+    		return false;
+    	}
+    	BackupHandler bh = new BackupHandler(this);
+    	bh.execute();
+    	return true;
+    }
+    
 }

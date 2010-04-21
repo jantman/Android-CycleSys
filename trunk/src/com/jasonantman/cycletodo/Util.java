@@ -32,6 +32,7 @@
  */
 package com.jasonantman.cycletodo;
 
+import android.os.Environment;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -133,5 +134,24 @@ public final class Util {
 		
 		return ts;
 	}
+	
+   
+    /**
+     * Generate a filename for the SQLite backup file
+     */
+    protected static String genBackupFilename()
+    {
+    	Time t = new Time();
+    	t.setToNow();
+    	String s = "CycleToDo_" + Integer.toString(t.year) + "-" + Integer.toString(t.month) + "-" + Integer.toString(t.monthDay) + "_";
+    	s = s + Integer.toString(t.hour) + "-" + Integer.toString(t.minute) + "-" + Integer.toString(t.second) + ".sqlite"; 
+    	return s;
+    }
+    
+    protected static boolean haveExternStorage()
+    {
+    	      return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+
 	
 }

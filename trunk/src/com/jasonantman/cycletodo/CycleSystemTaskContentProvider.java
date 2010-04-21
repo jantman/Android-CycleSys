@@ -62,7 +62,7 @@ public class CycleSystemTaskContentProvider extends ContentProvider {
 	public static final Uri CONTENT_URI = Uri.parse("content://com.jasonantman.cycletodo.cyclesystemtaskcontentprovider");
 	public static final String AUTHORITY = "com.jasonantman.cycletodo.cyclesystemtaskcontentprovider";
 	
-    private static final String DATABASE_NAME = "cycletodo.db";
+    private static final String DATABASE_NAME = "cycletodo.db"; // TODO - BAD - this is also defined in BackupHandler
     private static final int DATABASE_VERSION = 1;
     private static final String TASKS_TABLE_NAME = "tasks";
 	

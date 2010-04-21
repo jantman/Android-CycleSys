@@ -44,6 +44,7 @@ public final class TouchMe {
 
 	public static final String SVNrev = "$LastChangedRevision$";
 	
+	// touched
 	public static String getSvnRev()
 	{
 		String foo = SVNrev;
@@ -52,5 +53,5 @@ public final class TouchMe {
 		foo = foo.trim();
 		return foo;
 	}
-	
+
 }

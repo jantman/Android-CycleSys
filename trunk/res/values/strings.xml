@@ -51,6 +51,10 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_finish">Finish</string>
     <string name="menu_move">Move</string>
+    
+    <string name="settings_menu_backup">Backup to SD card</string>
+    <string name="settings_menu_default_category">Default Category</string>
+    <string name="settings_menu_work_days">Set Work Days</string>
 
 	<string name="title_edit">Edit Task</string>
 	<string name="title_add">Add Task</string>
@@ -62,4 +66,9 @@
 	
 	<string name="alert_notimplemented">NOTICE - this function has not been implemented.</string>
 	<string name="alert_notimplemented_title">Not Implemented.</string>
+	<string name="alert_storError_title">Storage Error</string>
+	
+	<string name="backup_error_title">Backup Error</string>
+	<string name="backup_ok_title">Backup Succeeded</string>
+	
 </resources>
