@@ -39,7 +39,7 @@ package com.jasonantman.cycletodo;
  * @return Integer[3] like [year, month, date]
  * @author jantman   
  *   
- */
+ */   
 public final class TouchMe {
 
 	public static final String SVNrev = "$LastChangedRevision$";
