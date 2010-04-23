@@ -48,6 +48,7 @@ BUILD CHECKLIST:
 8. zipalign -v 4 CycleToDo-unaligned.apk CycleToDo.apk
 9. Copy the two apk's into packages/
 10. Commit this as the canonical revision for this release.
-11. Tag the trunk.
+11. Tag the trunk:
 
+svn copy http://svn.jasonantman.com/Android-CycleSys/trunk/ http://svn.jasonantman.com/Android-CycleSys/tags/RELEASE-0.3.3/ -m "0.3.3 release - SVN rev 35"
 

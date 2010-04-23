@@ -107,37 +107,38 @@ public final class Util {
 		Time t = new Time();
 		t.set(bar.longValue() * 1000);
 		
-		int dayOfWeek = t.weekDay; // 0-6, 0 is sunday
-		
-		// we have a ts and the day of the week. find the next work day.
-		if(dayOfWeek < CycleToDo.firstWorkDay)
+		Integer tempI = new Integer(0);
+		Time tempT = new Time();
+		int tempDayOfWeek = 0;
+			
+		for(int i = ts + 86400; i <= ts + 604800; i+= 86400)
 		{
-			// before the start of the work week. move to next firstWorkDay
-			return (ts + ( (CycleToDo.firstWorkDay - dayOfWeek) * 86400));
+			tempI = i;
+			tempT.set(tempI.longValue() * 1000);
+			tempDayOfWeek = t.weekDay;
+			if(isWorkDay(tempDayOfWeek))
+			{
+				return i;
+			}
 		}
-		else if(dayOfWeek >= CycleToDo.lastWorkDay)
-		{
-			// after the end of the work week. move to next firstWorkDay
-			int foo = 6 - dayOfWeek;
-			foo = foo + CycleToDo.firstWorkDay + 1;
-			return (ts + ( foo * 86400) );
-		}
-		else if(dayOfWeek >= CycleToDo.firstWorkDay && dayOfWeek < CycleToDo.lastWorkDay)
-		{
-			// next day is a work day, just move to next day
-			return (ts + 86400);
-		}
-		else
-		{
-			if(CycleToDo.DEBUG_ON) { Log.d(TAG, "findNextWorkDay() UNHANDLED CASE ts=" + Integer.toString(ts) + " dayOfWeek=" + Integer.toString(dayOfWeek)); }
-		}
-		
+
 		return ts;
 	}
 	
+	/**
+	 * True if the weekDay (Time.weekDay, 0-6, 0=Sunday) is a work day, false otherwise
+	 * @param weekDay
+	 * @return boolean
+	 */
+	public static boolean isWorkDay(int weekDay)
+	{
+		if(CycleToDo.workday_values[weekDay] == true){ return true;}
+		return false;
+	}
    
     /**
      * Generate a filename for the SQLite backup file
+     * @return String
      */
     protected static String genBackupFilename()
     {
@@ -148,10 +149,61 @@ public final class Util {
     	return s;
     }
     
+    /**
+     * True or false whether we have external storage available.
+     * @return boolean
+     */
     protected static boolean haveExternStorage()
     {
     	      return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
+    /**
+     * Convert the boolean array for work days to an int to store in settings.
+     * @param foo boolean[]
+     * @return int
+     */
+    protected static int workDaysToInt(boolean[] foo)
+    {
+    	int bar = 0;
+    	if(foo[0] == true){ bar = bar | 1;} 
+    	if(foo[1] == true){ bar = bar | 2;}
+    	if(foo[2] == true){ bar = bar | 4;}
+    	if(foo[3] == true){ bar = bar | 8;}
+    	if(foo[4] == true){ bar = bar | 16;}
+    	if(foo[5] == true){ bar = bar | 32;}
+    	if(foo[6] == true){ bar = bar | 64;}
+    	/*
+    	 * 00000001 = 1 = Sunday
+    	 * 00000010 = 2 = Monday
+    	 * 00000100 = 4 = Tuesday
+    	 * 00001000 = 8 = Wednesday
+    	 * 00010000 = 16 = Thursday
+    	 * 00100000 = 32 = Friday
+    	 * 01000000 = 64 = Saturday
+    	 */
+    	
+    	// build in some error-handling here
+    	if(bar == 0){ bar = 62;} // if someone checked NO work days, default to M-F
+    	return bar;
+    }
+    
+    /**
+     * Convery the int for work days from settings back into a boolean array.
+     * @param foo int
+     * @return boolean[7]
+     */
+    protected static boolean[] workDaysFromInt(int foo)
+    {
+    	boolean[] bar = new boolean[7];
+    	if((foo & 1) == 1){ bar[0] = true;}
+    	if((foo & 2) == 2){ bar[1] = true;}
+    	if((foo & 4) == 4){ bar[2] = true;}
+    	if((foo & 8) == 8){ bar[3] = true;}
+    	if((foo & 16) == 16){ bar[4] = true;}
+    	if((foo & 32) == 32){ bar[5] = true;}
+    	if((foo & 64) == 64){ bar[6] = true;}
+    	return bar;
+    }
 	
 }

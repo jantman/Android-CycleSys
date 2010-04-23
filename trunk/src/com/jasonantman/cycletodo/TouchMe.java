@@ -53,5 +53,4 @@ public final class TouchMe {
 		foo = foo.trim();
 		return foo;
 	}
-
 }

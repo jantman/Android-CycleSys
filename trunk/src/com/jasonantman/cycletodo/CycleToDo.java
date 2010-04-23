@@ -44,6 +44,7 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -67,6 +68,7 @@ import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.MotionEvent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 
 /**
@@ -74,7 +76,7 @@ import android.content.SharedPreferences;
  * provided in the intent if there is one, otherwise defaults to displaying the
  * contents of the {@link NotePadProvider}
  */
-public class CycleToDo extends ListActivity {
+public class CycleToDo extends ListActivity implements View.OnClickListener{
     /** Called when the activity is first created. */
     
 	private static final String TAG = "CycleToDo";
@@ -103,8 +105,14 @@ public class CycleToDo extends ListActivity {
     protected static int firstWorkDay = 1; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     protected static int lastWorkDay = 5; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     
+    // @TODO - TODO - work day dialog box stuff
+    protected CharSequence[] _WORKDAY_OPTIONS = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+    protected static boolean[] workday_values =  new boolean[7];
+    // TODO - end work day stuff
+    
     // Preferences stuff
     public static final String PREFS_NAME = "CycleToDoPrefs";
+    public SharedPreferences settings;
     
     /**
      * TODO: no idea why these are here
@@ -125,6 +133,11 @@ public class CycleToDo extends ListActivity {
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
+    static final int MOVE_DATE_DIALOG_ID = 990;
+    // TODO - start week days stuff
+    static final int SETTINGS_WORK_DAYS_DIALOG_ID = 995;
+    // TODO - end week days stuff
+    
     // the callback received when the user "sets" the date in the dialog
     private DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
@@ -136,7 +149,6 @@ public class CycleToDo extends ListActivity {
                 }
             };
             
-    static final int MOVE_DATE_DIALOG_ID = 990;
     // the callback received when the user "sets" the date in the dialog
     private Uri FOO_MOVE_URI;
     private ContentResolver FOO_MOVE_RESOLVER;
@@ -241,10 +253,8 @@ public class CycleToDo extends ListActivity {
          // end Gesture detection
         
          // Restore preferences
-         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-         // EXAMPLE:
-         //boolean silent = settings.getBoolean("silentMode", false);
-         //setSilent(silent);
+         this.settings = getSharedPreferences(PREFS_NAME, 0);
+         getPrefsOnStart();
     }
 
     // this is really just for the prefs.
@@ -371,10 +381,10 @@ public class CycleToDo extends ListActivity {
         	doBackupToSD();
         	return true;
         case SETTINGS_MENU_ITEM_CATEGORY:
-        	showNotImplementedDialog("category");
+        	showNotImplementedDialog("work days");
         	return true;
         case SETTINGS_MENU_ITEM_WORK_DAYS:
-        	showNotImplementedDialog("work days");
+        	showDialog(SETTINGS_WORK_DAYS_DIALOG_ID);
         	return true;
         }
         return super.onOptionsItemSelected(item);
@@ -389,6 +399,12 @@ public class CycleToDo extends ListActivity {
         case MOVE_DATE_DIALOG_ID:
         	Integer[] bar = Util.tsLongToYMD(((long) this.CURRENT_TS * 1000));
             return new DatePickerDialog(this, mMoveDateSetListener, bar[0], bar[1], bar[2]);
+        case SETTINGS_WORK_DAYS_DIALOG_ID:
+            return new AlertDialog.Builder( this )
+            .setTitle( "Work Days" )
+            .setMultiChoiceItems( _WORKDAY_OPTIONS, workday_values, new DialogSelectionClickHandler() )
+            .setPositiveButton( "OK", new DialogButtonClickHandler() )
+            .create();
         }
         return null;
     }
@@ -569,5 +585,66 @@ public class CycleToDo extends ListActivity {
     	bh.execute();
     	return true;
     }
+    
+    // TODO - Begin dialog stuff
+    
+    /*
+     * DialogSelectionClickHandler just here for the work days dialog, serves no other purpose.
+     * Not actually used for anything.
+     */
+    public class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener
+    {
+        public void onClick( DialogInterface dialog, int clicked, boolean selected )
+        {
+        	
+        }
+    }
+
+    /*
+     * DialogButtonClickHandler just here for the work days dialog, serves no other purpose.
+     * Just fires another function when the OK button is clicked on the work days dialog.
+     */
+    public class DialogButtonClickHandler implements DialogInterface.OnClickListener
+    {
+            public void onClick( DialogInterface dialog, int clicked ) { switch( clicked ) { case DialogInterface.BUTTON_POSITIVE: updateWorkDays(); break; } }
+    }
+
+    /*
+     * Test function for dealing with the work days dialog selections.
+     * @TODO - TODO - remove this, replace it with something useful.
+     */
+    protected void printSelectedPlanets(){
+            for( int i = 0; i < _WORKDAY_OPTIONS.length; i++ ){
+                    Log.i( "ME", _WORKDAY_OPTIONS[ i ] + " selected: " + workday_values[i] );
+            }
+    }
+
+	/* 
+	 * Just here because we have to implement it for the work days dialog stuff - serves no purpose.
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
+	public void onClick(View v) { }
+	
+	/**
+	 * Writes the updated work days back to preferences.
+	 */
+	protected void updateWorkDays()
+	{
+	      SharedPreferences.Editor editor = this.settings.edit();
+	      editor.putInt("WORK_DAYS", Util.workDaysToInt(this.workday_values));
+	      editor.commit();
+	}
+	
+	/*
+	 * Update our settings object on start, also set defaults if not currently set.
+	 */
+	protected void getPrefsOnStart()
+	{	
+        // EXAMPLE:
+        //boolean silent = settings.getBoolean("silentMode", false);
+        //setSilent(silent);
+		
+		this.workday_values = Util.workDaysFromInt(settings.getInt("WORK_DAYS", 62)); // default of Mon-Fri = 62
+	}
     
 }
