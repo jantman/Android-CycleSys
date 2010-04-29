@@ -29,7 +29,6 @@
  * | $HeadURL::                                                         $ |
  * +----------------------------------------------------------------------+
  * @author Jason Antman <jason@jasonantman.com>
- * @TODO - TODO - update the license for all of these files. is Apache 2.0 compatible with GPLv3? Can I do this?? 
  */
 
 package com.jasonantman.cycletodo;
@@ -77,7 +76,8 @@ import android.content.res.Resources;
  * provided in the intent if there is one, otherwise defaults to displaying the
  * contents of the {@link NotePadProvider}
  */
-public class CycleToDo extends ListActivity implements View.OnClickListener{
+public class CycleToDo extends ListActivity implements View.OnClickListener
+{
     /** Called when the activity is first created. */
     
 	private static final String TAG = "CycleToDo";
@@ -103,22 +103,21 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
     
     // @TODO - TODO - these should be preferences
     private CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
+    
+    // @TODO - this is probably no longer needed, as we're using settings.
     protected static int firstWorkDay = 1; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     protected static int lastWorkDay = 5; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
     
-    // @TODO - TODO - work day dialog box stuff
+    // workday stuff used to get/set from Preferences
     protected CharSequence[] _WORKDAY_OPTIONS = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
     protected static boolean[] workday_values =  new boolean[7];
-    // TODO - end work day stuff
+    // end work day stuff
     
     // Preferences stuff
     public static final String PREFS_NAME = "CycleToDoPrefs";
     public SharedPreferences settings;
     
-    /**
-     * TODO: no idea why these are here
-     */
-    // Menu item ids
+    // Menu item ids - to make sure every menu item has a constant, unique integer ID
     public static final int MENU_ITEM_INSERT = Menu.FIRST;
     public static final int MENU_ITEM_GOTO = Menu.FIRST + 1;
     public static final int MENU_ITEM_MANAGE = Menu.FIRST + 2;
@@ -131,13 +130,12 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
     public static final int SETTINGS_MENU_ITEM_BACKUP = Menu.FIRST + 9;
     public static final int SETTINGS_MENU_ITEM_CATEGORY = Menu.FIRST + 10;
     public static final int SETTINGS_MENU_ITEM_WORK_DAYS = Menu.FIRST + 11;
+    public static final int CONTEXT_ITEM_DELETE = Menu.FIRST + 12;
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
     static final int MOVE_DATE_DIALOG_ID = 990;
-    // TODO - start week days stuff
     static final int SETTINGS_WORK_DAYS_DIALOG_ID = 995;
-    // TODO - end week days stuff
     
     // the callback received when the user "sets" the date in the dialog
     private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -150,7 +148,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
                 }
             };
             
-    // the callback received when the user "sets" the date in the dialog
+    // the callback received when the user moves to a new date
     private Uri FOO_MOVE_URI;
     private ContentResolver FOO_MOVE_RESOLVER;
     private DatePickerDialog.OnDateSetListener mMoveDateSetListener =
@@ -436,6 +434,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
         menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
         menu.add(0, CONTEXT_ITEM_EDIT, 1, R.string.menu_edit);
         menu.add(0, CONTEXT_ITEM_MOVE, 2, R.string.menu_move);
+        menu.add(0, CONTEXT_ITEM_DELETE, 2, R.string.menu_delete);
     }
         
     @Override
@@ -464,6 +463,10 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
             }
             case CONTEXT_ITEM_MOVE: {
             	showMoveItemDialog(taskUri);
+            	return true;
+            }
+            case CONTEXT_ITEM_DELETE: {
+            	getContentResolver().delete(taskUri, null, null);
             	return true;
             }
         }
