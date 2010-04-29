@@ -111,11 +111,14 @@ public final class Util {
 		Time tempT = new Time();
 		int tempDayOfWeek = 0;
 			
+		if(CycleToDo.DEBUG_ON){ Log.d(TAG, " before loop, ts= " + Integer.toString(ts) + " " + t.format2445()); } // DEBUG - remove me
+		
 		for(int i = ts + 86400; i <= ts + 604800; i+= 86400)
 		{
 			tempI = i;
 			tempT.set(tempI.longValue() * 1000);
-			tempDayOfWeek = t.weekDay;
+			tempDayOfWeek = tempT.weekDay;
+			if(CycleToDo.DEBUG_ON){ Log.d(TAG, " LOOP ts= " + Integer.toString(ts) + " " + t.format2445()); } // DEBUG - remove me
 			if(isWorkDay(tempDayOfWeek))
 			{
 				return i;
