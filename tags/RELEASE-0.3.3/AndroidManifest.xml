@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * | CycleToDo        http://CycleToDo.jasonantman.com                    |
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+ * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
+ * |                                                                      |
+ * | This program is free software; you can redistribute it and/or modify |
+ * | it under the terms of the GNU General Public License as published by |
+ * | the Free Software Foundation; either version 3 of the License, or    |
+ * | (at your option) any later version.                                  |
+ * |                                                                      |
+ * | This program is distributed in the hope that it will be useful,      |
+ * | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        |
+ * | GNU General Public License for more details.                         |
+ * |                                                                      |
+ * | You should have received a copy of the GNU General Public License    |
+ * | along with this program; if not, write to:                           |
+ * |                                                                      |
+ * | Free Software Foundation, Inc.                                       |
+ * | 59 Temple Place - Suite 330                                          |
+ * | Boston, MA 02111-1307, USA.                                          |
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+ * |Please use the above URL for bug reports and feature/support requests.|
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+ * | Authors: Jason Antman <jason@jasonantman.com>                        |
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+ * @author Jason Antman <jason@jasonantman.com>
+ -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.jasonantman.cycletodo"
+      android:versionCode="6" android:versionName="0.3.3">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
+        <provider android:authorities="com.jasonantman.cycletodo.cyclesystemtaskcontentprovider" android:name="com.jasonantman.cycletodo.CycleSystemTaskContentProvider"/>
+    
+        <activity android:name="CycleToDo" android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.jasonantman.task" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.jasonantman.task" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="TaskEditor"
+            android:theme="@android:style/Theme.Light"
+            android:label="@string/title_task"
+            android:screenOrientation="sensor"
+            android:configChanges="keyboardHidden|orientation" >
+            <!-- This filter says that we can view or edit the data of a single task -->
+            <intent-filter android:label="@string/resolve_edit">
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="com.jasonantman.cyclesystem.action.EDIT_TASK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.jasonantman.task" />
+            </intent-filter>
+
+            <!-- This filter says that we can create a new task inside of a directory of tasks. -->
+            <intent-filter>
+                <action android:name="android.intent.action.INSERT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.jasonantman.task" />
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name="Help"
+            android:theme="@android:style/Theme.Light"
+            android:label="@string/title_help"
+            android:screenOrientation="sensor"
+            android:configChanges="keyboardHidden|orientation" >
+            <intent-filter>
+            	<action android:name="android.intent.action.SYSTEM_TUTORIAL"></action>
+			</intent-filter>
+        </activity>
+
+    </application>
+    <uses-sdk android:minSdkVersion="3" />
+    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+</manifest> 

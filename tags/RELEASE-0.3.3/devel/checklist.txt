@@ -1,0 +1,54 @@
+/**
+ * +----------------------------------------------------------------------+
+ * | CycleToDo                  http://CycleToDo.jasonantman.com          |
+ * +----------------------------------------------------------------------+
+ * | Copyright (c) 2009 Jason Antman <jason@jasonantman.com>.             |
+ * |                                                                      |
+ * | This program is free software; you can redistribute it and/or modify |
+ * | it under the terms of the GNU General Public License as published by |
+ * | the Free Software Foundation; either version 3 of the License, or    |
+ * | (at your option) any later version.                                  |
+ * |                                                                      |
+ * | This program is distributed in the hope that it will be useful,      |
+ * | but WITHOUT ANY WARRANTY; without even the implied warranty of       |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        |
+ * | GNU General Public License for more details.                         |
+ * |                                                                      |
+ * | You should have received a copy of the GNU General Public License    |
+ * | along with this program; if not, write to:                           |
+ * |                                                                      |
+ * | Free Software Foundation, Inc.                                       |
+ * | 59 Temple Place - Suite 330                                          |
+ * | Boston, MA 02111-1307, USA.                                          |
+ * +----------------------------------------------------------------------+
+ * |Please use the above URL for bug reports and feature/support requests.|
+ * +----------------------------------------------------------------------+
+ * | Authors: Jason Antman <jason@jasonantman.com>                        |
+ * +----------------------------------------------------------------------+
+ * | $LastChangedRevision::                                             $ |
+ * | $HeadURL::                                                         $ |
+ * +----------------------------------------------------------------------+
+ * @author Jason Antman <jason@jasonantman.com>
+ */
+
+COMMIT CHECKLIST:
+1. Change src/com.jasonantman.cycletodo/TouchMe.java to update SVN keywords for revision.
+2. Commit, be sure to reference Eventum issue numbers.
+3. Create Time Tracking entries in Eventum.
+
+
+BUILD CHECKLIST:
+1. Test!
+2. Turn off logging and debugging and clean up data/files (set DEBUG = false)
+3. Grep for all "TODO" lines
+4. Remove the android:debuggable="true" attribute from the <application> element of the manifest.
+5. Update application versionCode and versionName in manifest.
+6. Compile
+7. APK Export Wizard - export signed package as CycleToDo-unaligned.apk
+8. zipalign -v 4 CycleToDo-unaligned.apk CycleToDo.apk
+9. Copy the two apk's into packages/
+10. Commit this as the canonical revision for this release.
+11. Tag the trunk:
+
+svn copy http://svn.jasonantman.com/Android-CycleSys/trunk/ http://svn.jasonantman.com/Android-CycleSys/tags/RELEASE-0.3.3/ -m "0.3.3 release - SVN rev 35"
+
