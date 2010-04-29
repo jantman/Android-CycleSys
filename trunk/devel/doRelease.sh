@@ -35,12 +35,17 @@ echo "Remember to export the *signed* APK through Eclipse as /home/jantman/andro
 read -p "SVN Rev Numver: " REVNUM
 read -p "Release Number (x.x.x): " RELNUM
 
+echo "renaming package..."
+mv "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleSystem-unaligned.apk" "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleToDo-unaligned.apk"
+
 echo "zipaligning package..."
 zipalign -v 4 "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleToDo-unaligned.apk" "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleToDo.apk"
 
-# copy new file to web1
+echo "linking release directory..."
+ln -s "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM" "/home/jantman/android-dev/cyclesystem/APKs/releases/$RELNUM"
+
 echo "copying file to web1..."
-scp "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleToDo-unaligned.apk" "/srv/www/vhosts/cycletodo.jasonantman.com/APKs/CycleToDo-$RELNUM.apk"
+scp "/home/jantman/android-dev/cyclesystem/APKs/svn/$REVNUM/CycleToDo.apk" "jantman@web1:/srv/www/vhosts/cycletodo.jasonantman.com/APKs/CycleToDo-$RELNUM.apk"
 
 echo "tagging in SVN..."
 svn copy http://svn.jasonantman.com/Android-CycleSys/trunk/ "http://svn.jasonantman.com/Android-CycleSys/tags/RELEASE-$RELNUM/" -m "$RELNUM release - SVN rev $REVNUM"
