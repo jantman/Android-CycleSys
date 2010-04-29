@@ -47,6 +47,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -259,7 +260,8 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
 
     // this is really just for the prefs.
     @Override
-    protected void onStop(){
+    protected void onStop()
+    {
        super.onStop();
     
       // Save user preferences. We need an Editor object to
@@ -273,7 +275,8 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
     }
     
     //@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         super.onCreateOptionsMenu(menu);
         
         // This is our one standard application action -- inserting a
@@ -518,7 +521,21 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
         TaskCursorAdapter adapter = new TaskCursorAdapter(this, R.layout.main, cursor,
         		new String[] { Tasks.TITLE, Tasks.PRIORITY, Tasks.CATEGORY_ID, Tasks.TIME_MIN }, new int[] { R.id.title, R.id.taskIcon, R.id.category, R.id.timeMins });
         setListAdapter(adapter);
+        // DataSetObserver to trigger updateList() when something is changed (to recalculate time total)
+        adapter.registerDataSetObserver(
+                new  DataSetObserver() {
+                	public void onChanged()
+                	{
+                		updateList();
+                	}
+                });
+        //adapter.registerDataSetObserver(observer);
+        
         timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
+        if(! getTimeTotal(cursor).equals("0m"))
+        {
+        	timeTitleStr = timeTitleStr + "  (" + getTimeTotal(cursor) + ")";
+        }
         headerDate.setText(timeTitleStr);
     }
     
@@ -645,6 +662,28 @@ public class CycleToDo extends ListActivity implements View.OnClickListener{
         //setSilent(silent);
 		
 		this.workday_values = Util.workDaysFromInt(settings.getInt("WORK_DAYS", 62)); // default of Mon-Fri = 62
+	}
+	
+	/**
+	 * Get the total time for all items in the cursor result, return it as a formatted string.
+	 * @param Cursor c
+	 * @return String - formatted string
+	 */
+	protected String getTimeTotal(Cursor c)
+	{
+		int total = 0;
+		String foo = "";
+	    if (c.moveToFirst())
+	    {
+	        int timeCol = c.getColumnIndex(Tasks.TIME_MIN); 
+	        do
+	        {
+	            total = total + c.getInt(timeCol);
+	        } while (c.moveToNext());
+	    }
+		if(total < 60){ foo = Integer.toString(total)+"m"; }
+		else{ foo = Integer.toString(total / 60) +"h " + Integer.toString(total % 60) + "m";}
+		return foo;
 	}
     
 }

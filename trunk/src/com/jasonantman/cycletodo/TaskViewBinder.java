@@ -67,18 +67,6 @@ public class TaskViewBinder implements SimpleCursorAdapter.ViewBinder {
     public boolean setViewValue(View view, Cursor cursor, int columnIndex)
     {
     	int priority = cursor.getInt(cursor.getColumnIndex(TaskList.Tasks.PRIORITY));
-    	
-    	// set the background color
-    	// @TODO - TODO - need to set color of whole line, not just parts
-    	/*
-        switch (priority) {
-        	case 1:  view.setBackgroundColor(COLOR_1); break;
-        	case 2:  view.setBackgroundColor(COLOR_2); break;
-        	case 3:  view.setBackgroundColor(COLOR_3); break;
-        	case 9:  view.setBackgroundColor(COLOR_9); break;
-        	default:  view.setBackgroundColor(COLOR_9); break;
-        }
-        */
       
     	// set the icon
     	int nImageIndex = cursor.getColumnIndex(TaskList.Tasks.PRIORITY);

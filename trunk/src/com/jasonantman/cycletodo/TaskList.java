@@ -42,11 +42,12 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * NotePadProvider
+ * 
  */
 public final class TaskList {
     public static final String AUTHORITY = "com.jasonantman.cycletodo.cyclesystemtaskcontentprovider";
 
+    // @TODO - update this - should be pulled from DB
     public static final String[] CATEGORIES = new String[] {
         "Work", // 0
         "Personal", // 1
