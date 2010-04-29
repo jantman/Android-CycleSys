@@ -431,7 +431,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         menu.setHeaderTitle(cursor.getString(cursor.getColumnIndex(Tasks.TITLE)));
 
         // Add a menu item to delete the note
-        menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
+        //menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
         menu.add(0, CONTEXT_ITEM_EDIT, 1, R.string.menu_edit);
         menu.add(0, CONTEXT_ITEM_MOVE, 2, R.string.menu_move);
         menu.add(0, CONTEXT_ITEM_DELETE, 2, R.string.menu_delete);
@@ -450,6 +450,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         Uri taskUri = ContentUris.withAppendedId(getIntent().getData(), info.id);
         
         switch (item.getItemId()) {
+        	/*
             case CONTEXT_ITEM_FINISH: {
                 // Update the task that the context menu is for
                 ContentValues values = new ContentValues();
@@ -457,6 +458,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
                 getContentResolver().update(taskUri, values, null, null);
                 return true;
             }
+            */
             case CONTEXT_ITEM_EDIT: {
             	startActivity(new Intent(Intent.ACTION_EDIT, taskUri));
             	return true;
