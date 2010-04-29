@@ -59,8 +59,8 @@ public class Help extends Activity {
         // text edit view for title
         //titleEdit = (EditText) findViewById(R.id.title);
         t = (TextView) findViewById(R.id.TextView02);
-        CharSequence text = "Copyright 2009 Jason Antman. Licensed under GNU GPLv3.\n\n";
-        text = text + "Thanks to Tom Limoncelli for writing the book that sparked all of this - Time Management for System Administrators.\n\n";
+        CharSequence text = "Copyright 2009-2010 Jason Antman. Licensed under GNU GPLv3.\n\n";
+        text = text + "Thanks to Tom Limoncelli for writing the book that sparked all of this - Time Management for System Administrators (http://amazon.com/o/ASIN/0596007833/tomontime-20).\n\n";
         text = text + "For help, to report bugs, or to get the source: http://cycletodo.jasonantman.com\n\n";
         text = text + "SVN revision: " + TouchMe.getSvnRev() + "\n";
         text = text + "Version Code: " + getVersionCode() + "\n";
