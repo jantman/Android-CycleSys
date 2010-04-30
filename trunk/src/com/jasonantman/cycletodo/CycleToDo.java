@@ -131,6 +131,9 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     public static final int SETTINGS_MENU_ITEM_CATEGORY = Menu.FIRST + 10;
     public static final int SETTINGS_MENU_ITEM_WORK_DAYS = Menu.FIRST + 11;
     public static final int CONTEXT_ITEM_DELETE = Menu.FIRST + 12;
+    public static final int CONTEXT_ITEM_TODAY = Menu.FIRST + 13;
+    public static final int CONTEXT_ITEM_NEXT_DAY = Menu.FIRST + 14;
+    public static final int CONTEXT_ITEM_NEXT_WORK_DAY = Menu.FIRST + 15;
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
@@ -420,7 +423,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             return;
         }
 
-        Cursor cursor = (Cursor) getListAdapter().getItem(info.position-2); // -2 fixes off-by-one error (issue: 
+        Cursor cursor = (Cursor) getListAdapter().getItem(info.position-2); // -2 fixes off-by-one error (issue: ??)
         
         if (cursor == null) {
             // For some reason the requested item isn't available, do nothing
@@ -433,8 +436,11 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         // Add a menu item to delete the note
         //menu.add(0, CONTEXT_ITEM_FINISH, 0, R.string.menu_finish);
         menu.add(0, CONTEXT_ITEM_EDIT, 1, R.string.menu_edit);
-        menu.add(0, CONTEXT_ITEM_MOVE, 2, R.string.menu_move);
-        menu.add(0, CONTEXT_ITEM_DELETE, 2, R.string.menu_delete);
+        menu.add(0, CONTEXT_ITEM_TODAY, 2, R.string.context_menu_move_today);
+        menu.add(0, CONTEXT_ITEM_NEXT_DAY, 3, R.string.context_menu_move_next_day);
+        menu.add(0, CONTEXT_ITEM_NEXT_WORK_DAY, 4, R.string.context_menu_move_next_work_day);
+        menu.add(0, CONTEXT_ITEM_MOVE, 5, R.string.context_menu_move_date);
+        menu.add(0, CONTEXT_ITEM_DELETE, 6, R.string.menu_delete);
     }
         
     @Override
@@ -448,7 +454,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         }
 
         Uri taskUri = ContentUris.withAppendedId(getIntent().getData(), info.id);
-        
+
         switch (item.getItemId()) {
         	/*
             case CONTEXT_ITEM_FINISH: {
@@ -469,6 +475,61 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             }
             case CONTEXT_ITEM_DELETE: {
             	getContentResolver().delete(taskUri, null, null);
+            	return true;
+            }
+            case CONTEXT_ITEM_TODAY: {
+            	//@TODO - TODO - THIS KILLED THE EMULATOR SOMEWHERE - svn 46
+            	
+            	// get the TS for the start of today
+                Time t = new Time();
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> Time t"); // DEBUG
+                t.setToNow();
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> t.setToNow()"); // DEBUG
+                int foo = Util.YMDtoTSint(t.year, t.month, t.monthDay);
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> int foo set"); // DEBUG
+            	foo = Util.getDayStart(foo);
+            	Log.e(TAG, "CONTEXT_ITEM_TODAY -> getDayStart() run"); // DEBUG
+            	
+            	// update the task
+                ContentValues values = new ContentValues();
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values instantiated"); // DEBUG
+                // Bump the modification time to now.
+                values.put(Tasks.MODIFIED_TS, ((int) System.currentTimeMillis() / 1000));
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 1"); // DEBUG
+                values.put(Tasks.DISPLAY_TS, foo);
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 2"); // DEBUG
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> starting update"); // DEBUG
+                getContentResolver().update(taskUri, values, null, null);
+                Log.e(TAG, "CONTEXT_ITEM_TODAY -> end update"); // DEBUG
+                
+            	return true;
+            }
+            case CONTEXT_ITEM_NEXT_DAY: {
+                // get the selected task's info from the content provider
+            	String[] proj = new String[] { Tasks._ID, Tasks.DISPLAY_TS};
+            	Cursor c = getContentResolver().query(taskUri, proj, null, null, null);
+            	c.moveToFirst();
+            	int foo = c.getInt(c.getColumnIndex(Tasks.DISPLAY_TS));
+            	
+            	// update the task
+                ContentValues values = new ContentValues();
+                values.put(Tasks.MODIFIED_TS, ((int) System.currentTimeMillis() / 1000)); // Bump the modification time to now.
+                values.put(Tasks.DISPLAY_TS, (foo + 86400)); // increment the display_ts by a day
+                getContentResolver().update(taskUri, values, null, null); // fire the update
+            	return true;
+            }
+            case CONTEXT_ITEM_NEXT_WORK_DAY: {
+                // get the selected task's info from the content provider
+            	String[] proj = new String[] { Tasks._ID, Tasks.DISPLAY_TS};
+            	Cursor c = getContentResolver().query(taskUri, proj, null, null, null);
+            	c.moveToFirst();
+            	int foo = c.getInt(c.getColumnIndex(Tasks.DISPLAY_TS));
+            	
+            	// update the task
+                ContentValues values = new ContentValues();
+                values.put(Tasks.MODIFIED_TS, ((int) System.currentTimeMillis() / 1000)); // Bump the modification time to now.
+                values.put(Tasks.DISPLAY_TS, Util.findNextWorkDay(foo)); // update to the next work day
+                getContentResolver().update(taskUri, values, null, null); // fire the update
             	return true;
             }
         }
@@ -534,7 +595,6 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
                 		updateList();
                 	}
                 });
-        //adapter.registerDataSetObserver(observer);
         
         timeTitleStr = DateFormat.format(TITLE_TIME_FORMAT, ((long) this.CURRENT_TS * 1000));
         if(! getTimeTotal(cursor).equals("0m"))

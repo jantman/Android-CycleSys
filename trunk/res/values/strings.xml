@@ -51,6 +51,10 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_finish">Finish</string>
     <string name="menu_move">Move</string>
+    <string name="context_menu_move_date">Move to Date</string>
+    <string name="context_menu_move_today">Move to Today</string>
+    <string name="context_menu_move_next_day">Move to Next Day</string>
+    <string name="context_menu_move_next_work_day">Move to Next Work Day</string>
     
     <string name="settings_menu_backup">Backup to SD card</string>
     <string name="settings_menu_default_category">Default Category</string>
