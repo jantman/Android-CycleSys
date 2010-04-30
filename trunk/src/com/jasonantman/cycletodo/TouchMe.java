@@ -52,5 +52,5 @@ public final class TouchMe {
 		foo = foo.substring(foo.indexOf(":")+1);
 		foo = foo.trim();
 		return foo;
-	}
+	}    
 }

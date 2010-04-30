@@ -75,4 +75,6 @@
 	<string name="backup_error_title">Backup Error</string>
 	<string name="backup_ok_title">Backup Succeeded</string>
 	
+	<string name="OK">OK</string>
+	
 </resources>

@@ -68,7 +68,7 @@ import android.text.format.DateFormat;
 import android.text.format.Time;
 import android.view.MotionEvent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.content.DialogInterface.OnClickListener;
 
 
 /**
@@ -104,10 +104,6 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     // @TODO - TODO - these should be preferences
     private CharSequence TITLE_TIME_FORMAT = "E, MMM d yyyy";
     
-    // @TODO - this is probably no longer needed, as we're using settings.
-    protected static int firstWorkDay = 1; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
-    protected static int lastWorkDay = 5; // 0-6, 0 is Sunday, 1 is Monday, 5 is Friday
-    
     // workday stuff used to get/set from Preferences
     protected CharSequence[] _WORKDAY_OPTIONS = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
     protected static boolean[] workday_values =  new boolean[7];
@@ -137,8 +133,11 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
-    static final int MOVE_DATE_DIALOG_ID = 990;
-    static final int SETTINGS_WORK_DAYS_DIALOG_ID = 995;
+    static final int MOVE_DATE_DIALOG_ID = 998;
+    static final int SETTINGS_WORK_DAYS_DIALOG_ID = 997;
+    static final int DIALOG_MANAGE_1 = 996;
+    static final int DIALOG_MANAGE_TODAY_CONFIRM = 995;
+    static final int DIALOG_MANAGE_TOMORROW_CONFIRM = 994;
     
     // the callback received when the user "sets" the date in the dialog
     private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -379,7 +378,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         	showDialog(DATE_DIALOG_ID);
         	return true;
         case MENU_ITEM_MANAGE:
-        	showNotImplementedDialog("manage");
+        	showDialog(DIALOG_MANAGE_1);
         	return true;
         case SETTINGS_MENU_ITEM_BACKUP:
         	doBackupToSD();
@@ -407,7 +406,26 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             return new AlertDialog.Builder( this )
             .setTitle( "Work Days" )
             .setMultiChoiceItems( _WORKDAY_OPTIONS, workday_values, new DialogSelectionClickHandler() )
-            .setPositiveButton( "OK", new DialogButtonClickHandler() )
+            .setPositiveButton("OK", new DialogButtonClickHandler() )
+            .create();
+        case DIALOG_MANAGE_1:
+            return new AlertDialog.Builder( this )
+            .setTitle( "Manage Tasks" )
+            .setPositiveButton( "Move to Today", new ManageDialogClickListener() )
+            .setNeutralButton( "Move to Tomorrow", new ManageDialogClickListener() )
+            .setNegativeButton( "Cancel", new ManageDialogClickListener() )
+            .create();
+        case DIALOG_MANAGE_TODAY_CONFIRM:
+            return new AlertDialog.Builder( this )
+            .setTitle( "Move Old Tasks to Today" )
+            .setPositiveButton( "Ok", new ManageDialogTodayClickListener() )
+            .setNegativeButton( "Cancel", new ManageDialogTodayClickListener() )
+            .create();
+        case DIALOG_MANAGE_TOMORROW_CONFIRM:
+            return new AlertDialog.Builder( this )
+            .setTitle( "Move Old Tasks to Tomorrow" )
+            .setPositiveButton( "Ok", new ManageDialogTomorrowClickListener() )
+            .setNegativeButton( "Cancel", new ManageDialogTomorrowClickListener() )
             .create();
         }
         return null;
@@ -477,6 +495,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             	getContentResolver().delete(taskUri, null, null);
             	return true;
             }
+            // @TODO - TODO - move all of the code for these next 3 into their own methods
             case CONTEXT_ITEM_TODAY: {
             	//@TODO - TODO - THIS KILLED THE EMULATOR SOMEWHERE - svn 46
             	
@@ -668,11 +687,9 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     	return true;
     }
     
-    // TODO - Begin dialog stuff
-    
-    /*
+    /**
      * DialogSelectionClickHandler just here for the work days dialog, serves no other purpose.
-     * Not actually used for anything.
+     * Not actually used for anything, but it needs to be implemented.
      */
     public class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener
     {
@@ -682,23 +699,103 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         }
     }
 
-    /*
+    /**
      * DialogButtonClickHandler just here for the work days dialog, serves no other purpose.
      * Just fires another function when the OK button is clicked on the work days dialog.
      */
-    public class DialogButtonClickHandler implements DialogInterface.OnClickListener
+    public class DialogButtonClickHandler implements OnClickListener
     {
             public void onClick( DialogInterface dialog, int clicked ) { switch( clicked ) { case DialogInterface.BUTTON_POSITIVE: updateWorkDays(); break; } }
     }
 
-    /*
-     * Test function for dealing with the work days dialog selections.
-     * @TODO - TODO - remove this, replace it with something useful.
+    /**
+     * Handle clicks in the Manage dialog. Just fires other functions when buttons are clicked.
+     * @author jantman
+     *
      */
-    protected void printSelectedPlanets(){
-            for( int i = 0; i < _WORKDAY_OPTIONS.length; i++ ){
-                    Log.i( "ME", _WORKDAY_OPTIONS[ i ] + " selected: " + workday_values[i] );
-            }
+    public class ManageDialogClickListener implements OnClickListener
+    {
+		/**
+		 * Handle clicks in the Manage dialog, called automatically...
+		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+		 * @param DialogInterface dialog
+		 * @param int which - which button
+		 */
+		public void onClick(DialogInterface dialog, int which)
+		{
+			Log.e(TAG, "on click int: " + Integer.toString(which));
+			if(which == AlertDialog.BUTTON_POSITIVE)
+			{
+				// fire the confirmation dialog for move to today
+				showDialog(DIALOG_MANAGE_TODAY_CONFIRM);
+			}
+			else if(which == AlertDialog.BUTTON_NEUTRAL)
+			{
+				// fire the confirmation dialog for move to tomorrow
+				showDialog(DIALOG_MANAGE_TOMORROW_CONFIRM);
+			}
+			// else ignore, user clicked cancel.
+		}
+    }
+    
+    /**
+     * Handle clicks in the Manage dialog for today - handles y/n confirmation
+     * @author jantman
+     *
+     */
+    public class ManageDialogTodayClickListener implements OnClickListener
+    {
+		/**
+		 * Handle clicks in the Manage dialog confirmation dialog for move to today, called automatically...
+		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+		 * @param DialogInterface dialog
+		 * @param int which - which button
+		 */
+		public void onClick(DialogInterface dialog, int which)
+		{
+			if(which == AlertDialog.BUTTON_POSITIVE)
+			{
+            	// get the TS for the start of today
+                Time t = new Time();
+                t.setToNow();
+                int foo = Util.YMDtoTSint(t.year, t.month, t.monthDay);
+            	foo = Util.getDayStart(foo);
+            	
+				// move to today
+				manageToTS(foo, foo);
+			}
+			// else ignore, user clicked cancel.
+		}
+    }
+    
+    /**
+     * Handle clicks in the Manage dialog for tomorrow - handles y/n confirmation
+     * @author jantman
+     *
+     */
+    public class ManageDialogTomorrowClickListener implements OnClickListener
+    {
+		/**
+		 * Handle clicks in the Manage dialog confirmation dialog for move to tomorrow, called automatically...
+		 * @see android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)
+		 * @param DialogInterface dialog
+		 * @param int which - which button
+		 */
+		public void onClick(DialogInterface dialog, int which)
+		{
+			if(which == AlertDialog.BUTTON_POSITIVE)
+			{
+            	// get the TS for the start of today
+                Time t = new Time();
+                t.setToNow();
+                int foo = Util.YMDtoTSint(t.year, t.month, t.monthDay);
+            	foo = Util.getDayStart(foo); // add a day for tomorrow
+            	
+				// move to today
+				manageToTS(foo, (foo + 86400));
+			}
+			// else ignore, user clicked cancel.
+		}
     }
 
 	/* 
@@ -749,6 +846,24 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
 		if(total < 60){ foo = Integer.toString(total)+"m"; }
 		else{ foo = Integer.toString(total / 60) +"h " + Integer.toString(total % 60) + "m";}
 		return foo;
+	}
+	
+	/**
+	 * Moves all tasks with a display_ts less than the start of today to the specified ts.
+	 * @param before int move all tasks with display_ts < before
+	 * @param ts int the timestamp of when to move the tasks to
+	 */
+	protected void manageToTS(int before, int to)
+	{
+    	// get the TS for the start of today
+		int beforeStart = Util.getDayStart(before);
+    	int toStart = Util.getDayStart(to);
+    	
+    	// update the task
+        ContentValues values = new ContentValues();
+        values.put(Tasks.MODIFIED_TS, ((int) System.currentTimeMillis() / 1000)); // Bump the modification time to now.
+        values.put(Tasks.DISPLAY_TS, toStart); // update to the next work day
+        getContentResolver().update(getIntent().getData(), values, Tasks.DISPLAY_TS + "<" + Integer.toString(beforeStart), null); // fire the update
 	}
     
 }
