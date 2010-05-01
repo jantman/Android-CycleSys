@@ -57,6 +57,7 @@
     <string name="context_menu_move_next_work_day">Move to Next Work Day</string>
     
     <string name="settings_menu_backup">Backup to SD card</string>
+    <string name="settings_menu_restore">Restore from SD card</string>
     <string name="settings_menu_default_category">Default Category</string>
     <string name="settings_menu_work_days">Set Work Days</string>
 

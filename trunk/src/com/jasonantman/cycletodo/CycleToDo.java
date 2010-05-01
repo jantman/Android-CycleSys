@@ -33,6 +33,9 @@
 
 package com.jasonantman.cycletodo;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 import com.jasonantman.cycletodo.R;
 import com.jasonantman.cycletodo.TaskList.Tasks;
 import android.app.AlertDialog;
@@ -49,6 +52,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.GestureDetector;
@@ -130,6 +134,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     public static final int CONTEXT_ITEM_TODAY = Menu.FIRST + 13;
     public static final int CONTEXT_ITEM_NEXT_DAY = Menu.FIRST + 14;
     public static final int CONTEXT_ITEM_NEXT_WORK_DAY = Menu.FIRST + 15;
+    public static final int SETTINGS_MENU_ITEM_RESTORE = Menu.FIRST + 16;
     
     // dialog IDs
     static final int DATE_DIALOG_ID = 999;
@@ -138,6 +143,12 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     static final int DIALOG_MANAGE_1 = 996;
     static final int DIALOG_MANAGE_TODAY_CONFIRM = 995;
     static final int DIALOG_MANAGE_TOMORROW_CONFIRM = 994;
+    static final int RESTORE_CHOOSER_DIALOG = 993;
+    static final int RESTORE_CONFIRM_DIALOG = 992;
+    
+    // for backup restore
+    protected CharSequence[] BACKUP_FILES_LIST = null;
+    protected String BACKUP_FILE_NAME = "";
     
     // the callback received when the user "sets" the date in the dialog
     private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -305,6 +316,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         	.setIcon(android.R.drawable.ic_menu_preferences);
         
         SettingsMenu.add(0, SETTINGS_MENU_ITEM_BACKUP, 0, R.string.settings_menu_backup);
+        SettingsMenu.add(0, SETTINGS_MENU_ITEM_RESTORE, 0, R.string.settings_menu_restore);
         SettingsMenu.add(0, SETTINGS_MENU_ITEM_CATEGORY, 0, R.string.settings_menu_default_category);
         SettingsMenu.add(0, SETTINGS_MENU_ITEM_WORK_DAYS, 0, R.string.settings_menu_work_days);
         
@@ -383,6 +395,19 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
         case SETTINGS_MENU_ITEM_BACKUP:
         	doBackupToSD();
         	return true;
+        case SETTINGS_MENU_ITEM_RESTORE:
+        	if(! Util.haveExternStorage())
+        	{
+        		AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        		dlgAlert.setMessage("ERROR - External storage not available.");
+        		dlgAlert.setTitle(R.string.alert_storError_title);
+        		dlgAlert.setPositiveButton("OK", null);
+        		dlgAlert.setCancelable(true);
+        		dlgAlert.create().show();
+        		return false;
+        	}
+            showDialog(RESTORE_CHOOSER_DIALOG);
+        	return true;
         case SETTINGS_MENU_ITEM_CATEGORY:
         	showNotImplementedDialog("work days");
         	return true;
@@ -426,6 +451,24 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             .setTitle( "Move Old Tasks to Tomorrow" )
             .setPositiveButton( "Ok", new ManageDialogTomorrowClickListener() )
             .setNegativeButton( "Cancel", new ManageDialogTomorrowClickListener() )
+            .create();
+        case RESTORE_CHOOSER_DIALOG:
+        	this.BACKUP_FILES_LIST = getBackupFiles();
+        	if(CycleToDo.DEBUG_ON){ Log.e(TAG, "files list length: " + Integer.toString(this.BACKUP_FILES_LIST.length));} // DEBUG
+        	RestoreFileButtonHandler rfbh = new RestoreFileButtonHandler();
+        	return new AlertDialog.Builder( this )
+            .setTitle( "Restore Database Backup")
+            .setPositiveButton("OK", rfbh )
+            .setNegativeButton("Cancel", rfbh )
+            .setSingleChoiceItems(this.BACKUP_FILES_LIST, -1, rfbh)
+            .create();
+        case RESTORE_CONFIRM_DIALOG:
+        	RestoreFileConfirmHandler rfch = new RestoreFileConfirmHandler();
+        	return new AlertDialog.Builder( this )
+            .setTitle( "Confirm Restore")
+            .setMessage("Are you sure you want to overwrite the current database with '" + BACKUP_FILE_NAME + "'? All current tasks and categories will be overwritten.")
+            .setPositiveButton("OK", rfch )
+            .setNegativeButton("Cancel", rfch )
             .create();
         }
         return null;
@@ -501,25 +544,25 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             	
             	// get the TS for the start of today
                 Time t = new Time();
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> Time t"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> Time t");} // DEBUG
                 t.setToNow();
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> t.setToNow()"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> t.setToNow()");} // DEBUG
                 int foo = Util.YMDtoTSint(t.year, t.month, t.monthDay);
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> int foo set"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> int foo set");} // DEBUG
             	foo = Util.getDayStart(foo);
-            	Log.e(TAG, "CONTEXT_ITEM_TODAY -> getDayStart() run"); // DEBUG
+            	if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> getDayStart() run");} // DEBUG
             	
             	// update the task
                 ContentValues values = new ContentValues();
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values instantiated"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> values instantiated");} // DEBUG
                 // Bump the modification time to now.
                 values.put(Tasks.MODIFIED_TS, ((int) System.currentTimeMillis() / 1000));
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 1"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 1");} // DEBUG
                 values.put(Tasks.DISPLAY_TS, foo);
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 2"); // DEBUG
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> starting update"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> values.put 2");} // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> starting update");} // DEBUG
                 getContentResolver().update(taskUri, values, null, null);
-                Log.e(TAG, "CONTEXT_ITEM_TODAY -> end update"); // DEBUG
+                if(CycleToDo.DEBUG_ON){ Log.e(TAG, "CONTEXT_ITEM_TODAY -> end update");} // DEBUG
                 
             	return true;
             }
@@ -688,6 +731,39 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
     }
     
     /**
+     * Restore the SQLite backup from the SD card
+     */
+    protected boolean doRestoreFromSD()
+    {
+    	// BACKUP_FILE_NAME
+    	RestoreHandler rh = new RestoreHandler(this);
+    	rh.execute(BACKUP_FILE_NAME);
+    	return true;
+    }
+    
+    /**
+     * Gets the filenames of the backup files
+     * @return CharSequence[]
+     */
+    protected CharSequence[] getBackupFiles()
+    {
+    	File dh = Environment.getExternalStorageDirectory();
+    	//FilenameFilter fnf = new FilenameFilter();
+    	
+    	File[] files = dh.listFiles(new BackupFilenameFilter());
+    	if(CycleToDo.DEBUG_ON){ Log.e(TAG, "getBackupFiles() - length is " + Integer.toString(files.length));} // DEBUG
+    	CharSequence[] foo = new CharSequence[files.length];
+    	
+    	int count = 0;
+    	for( File file : files)
+    	{
+    		foo[count] = file.getName();
+    		count = count + 1;
+    	}
+    	return foo;
+    }
+    
+    /**
      * DialogSelectionClickHandler just here for the work days dialog, serves no other purpose.
      * Not actually used for anything, but it needs to be implemented.
      */
@@ -708,6 +784,79 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
             public void onClick( DialogInterface dialog, int clicked ) { switch( clicked ) { case DialogInterface.BUTTON_POSITIVE: updateWorkDays(); break; } }
     }
 
+    // @TODO - TODO - remove this next class
+    
+    /**
+     * click listener for Restore file selection dialog
+     * @author jantman
+     *
+     */
+    public class RestoreFileClickListener implements OnClickListener
+    {
+		public void onClick(DialogInterface dialog, int which)
+		{
+			//this.BACKUP_FILES_LIST
+			if(CycleToDo.DEBUG_ON){ Log.e(TAG, "clicked on " + Integer.toString(which) + " : " + BACKUP_FILES_LIST[which]);}
+		}
+    	
+    }
+    
+    /**
+     * Handle selections and button press in first Restore Backup dialog (restore file chooser)
+     * @author jantman
+     *
+     */
+    public class RestoreFileButtonHandler implements OnClickListener
+    {
+    	protected int selectedId = -1;
+    	
+		public void onClick(DialogInterface dialog, int which)
+		{
+			if(which == Dialog.BUTTON_POSITIVE)
+			{
+				if(CycleToDo.DEBUG_ON){ Log.e(TAG, "RestoreFileButtonHandler OK, selection=" + Integer.toString(selectedId));} // TODO - DEBUG
+				BACKUP_FILE_NAME = BACKUP_FILES_LIST[which].toString();
+				showDialog(RESTORE_CONFIRM_DIALOG); // RESTORE_CONFIRM_DIALOG
+			}
+			else if(which == Dialog.BUTTON_NEGATIVE)
+			{
+				if(CycleToDo.DEBUG_ON){ Log.e(TAG, "RestoreFileButtonHandler CANCEL");} // TODO - DEBUG
+				// cancel, do nothing
+				BACKUP_FILE_NAME = "";
+			}
+			else
+			{
+				// update local var used to hold selection
+				selectedId = which;
+				if(CycleToDo.DEBUG_ON){ Log.e(TAG, "button handler SELECTED" + Integer.toString(which) + " : " + BACKUP_FILES_LIST[which]);} // TODO - DEBUG
+			}
+		}
+    }
+    
+    /**
+     * Handle selections and button press in first Restore Backup dialog (restore file chooser)
+     * @author jantman
+     *
+     */
+    public class RestoreFileConfirmHandler implements OnClickListener
+    {
+    	
+		public void onClick(DialogInterface dialog, int which)
+		{
+			if(which == Dialog.BUTTON_POSITIVE)
+			{
+				if(CycleToDo.DEBUG_ON){ Log.e(TAG, "RestoreFileCOnfirmHandler OK");} // TODO - DEBUG
+				doRestoreFromSD();
+			}
+			else if(which == Dialog.BUTTON_NEGATIVE)
+			{
+				if(CycleToDo.DEBUG_ON){ Log.e(TAG, "RestoreFileCOnfirmHandler CANCEL");} // TODO - DEBUG
+				// cancel, do nothing
+				BACKUP_FILE_NAME = "";
+			}
+		}
+    }
+    
     /**
      * Handle clicks in the Manage dialog. Just fires other functions when buttons are clicked.
      * @author jantman
@@ -723,7 +872,7 @@ public class CycleToDo extends ListActivity implements View.OnClickListener
 		 */
 		public void onClick(DialogInterface dialog, int which)
 		{
-			Log.e(TAG, "on click int: " + Integer.toString(which));
+			if(CycleToDo.DEBUG_ON){ Log.e(TAG, "on click int: " + Integer.toString(which));}
 			if(which == AlertDialog.BUTTON_POSITIVE)
 			{
 				// fire the confirmation dialog for move to today

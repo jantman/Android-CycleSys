@@ -147,8 +147,9 @@ public final class Util {
     {
     	Time t = new Time();
     	t.setToNow();
-    	String s = "CycleToDo_" + Integer.toString(t.year) + "-" + Integer.toString(t.month) + "-" + Integer.toString(t.monthDay) + "_";
-    	s = s + Integer.toString(t.hour) + "-" + Integer.toString(t.minute) + "-" + Integer.toString(t.second) + ".sqlite"; 
+    	//String s = "CycleToDo_" + Integer.toString(t.year) + "-" + Integer.toString(t.month + 1) + "-" + Integer.toString(t.monthDay) + "_";
+    	//s = s + Integer.toString(t.hour) + "-" + Integer.toString(t.minute) + "-" + Integer.toString(t.second) + ".sqlite"; 
+    	String s = "CycleToDo_" + t.format("%Y-%m-%d_%H-%M-%S") + ".sqlite";
     	return s;
     }
     
